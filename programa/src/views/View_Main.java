@@ -46,16 +46,16 @@ public class View_Main extends javax.swing.JFrame {
         FileNameExtensionFilter filter = new FileNameExtensionFilter("Archivos de texto (*.txt)", "txt");
         chooser.setFileFilter(filter);
 
-        // Mostrar el diálogo para abrir el archivo
+        // Mostrar el diálogo para abrir el file
         int result = chooser.showOpenDialog(null);
 
-        // Verificar si el usuario seleccionó un archivo
+        // Verificar si el usuario seleccionó un file
         if (result == JFileChooser.APPROVE_OPTION) {
             File file = chooser.getSelectedFile();
 
             try {
                 String ST = new String(Files.readAllBytes(file.toPath()));
-                jTextArea_Input.setText(ST);  // Establecer el contenido del archivo en el JTextArea
+                jTextArea_Input.setText(ST);  // Establecer el contenido del file en el JTextArea
             } catch (FileNotFoundException ex) {
                 Logger.getLogger(View_Main.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
             } catch (IOException ex) {
@@ -64,24 +64,33 @@ public class View_Main extends javax.swing.JFrame {
         }
     }
 
+    /**
+     * Guarda el contenido del área de texto (`JTextArea`) en un archivo de texto (.txt) 
+     * seleccionado por el usuario a través de un cuadro de diálogo.
+     *
+     * @see JFileChooser
+     * @see BufferedWriter
+     * @see FileWriter
+     * @see JTextArea
+     */
     private void saveToFile() {
-        string content = jTextArea_Output.getText()
+        String content = jTextArea_Output.getText();
         
         //Abre una ventana de dialogo para elegir la ruta donde se guardará el texto analizado léxicamente.
         JFileChooser fileChooser = new JFileChooser();
-        int seleccion = fileChooser.showSaveDialog(null);
+        int selection = fileChooser.showSaveDialog(null);
 
-        if (seleccion == JFileChooser.APPROVE_OPTION) {
-            File archivo = fileChooser.getSelectedFile();
+        if (selection == JFileChooser.APPROVE_OPTION) {
+            File file = fileChooser.getSelectedFile();
             
-           // Verificar si el archivo tiene la extensión .txt
-           if (!archivo.getName().toLowerCase().endsWith(".txt")) {
-               archivo = new File(archivo.getAbsolutePath() + ".txt");
+           // Verificar si el file tiene la extensión .txt
+           if (!file.getName().toLowerCase().endsWith(".txt")) {
+               file = new File(file.getAbsolutePath() + ".txt");
            }
             
-            try (BufferedWriter writer = new BufferedWriter(new FileWriter(archivo))) {
+            try (BufferedWriter writer = new BufferedWriter(new FileWriter(file))) {
                 writer.write(content);
-                JOptionPane.showMessageDialog(null, "Archivo guardado exitosamente en: " + archivo.getPath());
+                JOptionPane.showMessageDialog(null, "Archivo guardado exitosamente en: " + file.getPath());
             } catch (IOException e) {
                 JOptionPane.showMessageDialog(null, "Error al guardar el archivo: " + e.getMessage());
             }
@@ -120,7 +129,7 @@ public class View_Main extends javax.swing.JFrame {
                 //Tokens token = lexer.yylex();
                 Symbol symbol = lexer.next_token();
                 if (symbol == null) {
-                    // Guardar el resultado en un archivo             
+                    // Guardar el resultado en un file             
                     jTextArea_Input.setText(sb.toString());
                     return;
                 }
@@ -306,7 +315,7 @@ public class View_Main extends javax.swing.JFrame {
                         break;
                     case sym.EndFile:
                         sb.append(String.format(formato, "<FIN DE ARCHIVO>", "", ""));
-                        //Devuelve el resultado del texto analizado al alcanzar el fin del archivo
+                        //Devuelve el resultado del texto analizado al alcanzar el fin del file
                         jTextArea_Output.setText(sb.toString());
                         System.out.print("\033[H\033[2J");  
                         System.out.flush();  
