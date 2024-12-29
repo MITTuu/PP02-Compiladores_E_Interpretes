@@ -169,6 +169,3 @@ newLine              = [\n]
 
     /* Error de analisis */
     .                               { return new Symbol(sym.Error, yychar, yyline, yytext()); }
-
-    /* Fin de archivo (EOF) */
-    <<EOF>>                         { return new Symbol(sym.EndFile, yychar, yyline, yytext()); }

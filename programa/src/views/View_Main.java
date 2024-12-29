@@ -2,7 +2,9 @@ package views;
 
 import bin.sym;
 import bin.Lexer;
+import bin.Parser;
 import bin.sym;
+import java.awt.Color;
 import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -10,10 +12,14 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.io.StringReader;
 import java.nio.file.Files;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 import java_cup.runtime.Symbol;
 import javax.swing.JFileChooser;
 import javax.swing.JOptionPane;
+import javax.swing.JTextArea;
 import javax.swing.filechooser.FileNameExtensionFilter;
 
 /**
@@ -99,13 +105,46 @@ public class View_Main extends javax.swing.JFrame {
         }
     }
     
+    private void analizadorSintactico(){
+        String expr = jTextArea_Input.getText();
+
+        List<String> errores = new ArrayList<>();
+        
+        // Variable para controlar el ciclo de análisis
+        int inicioAnalisis = 0;
+        boolean analizando = true;
+        int linea = 0;
+        int columna = 0;
+        
+        // Obtener el texto a analizar, comenzando desde el índice actual
+            String textoAnalizar = expr.substring(inicioAnalisis);
+        Parser parser = new Parser(new Lexer(new StringReader(textoAnalizar)));
+
+        try {
+            parser.parse();
+            jTextArea_Output.setText("Analisis realizado correctamente");
+            jTextArea_Output.setForeground(new Color(25, 111, 61));
+        } catch (Exception ex) {
+            Symbol sym = parser.getS();
+            jTextArea_Output.setText("Error de sintaxis. Linea: " + (sym.right + 1) + " Columna: " + (sym.left + 1) + ", Texto: \"" + sym.value + "\"");
+            jTextArea_Output.setForeground(Color.red);
+        }
+
+                
+    }
+
     private void analizadorLexico() {
        int contLinea = 1;
        int contColumna = 1;
        int lexemaLength = 0;
        boolean continuaError = false;
         // Obtiene el texto de entrada desde JTATextoArea
-        String expr = jTextArea_Input.getText(); 
+        String expr = jTextArea_Input.getText();
+        jTextArea_Output.setForeground(Color.BLUE);
+        if(expr.isEmpty()){
+            jTextArea_Output.setText("Lexical analysis completed: empty file.");
+            return;
+        }
         Lexer lexer = new Lexer(new StringReader(expr));
         
         // Variables para definir el ancho de las columnas
@@ -128,9 +167,9 @@ public class View_Main extends javax.swing.JFrame {
             while (true) {
                 //Tokens token = lexer.yylex();
                 Symbol symbol = lexer.next_token();
-                if (symbol == null) {
+                if (symbol == null || symbol.value == null) {
                     // Guardar el resultado en un file             
-                    jTextArea_Input.setText(sb.toString());
+                    jTextArea_Output.setText(sb.toString());
                     return;
                 }
                 //Registrar longitud de la cadena de caracteres del lexema para calcular la columna
@@ -307,7 +346,7 @@ public class View_Main extends javax.swing.JFrame {
                         if(continuaError){
                             break;
                         }
-                        sb.append(String.format(formato, "Columna " + contColumna ,"<ERROR: Símbolo no definido>" , "" ));
+                        sb.append(String.format(formato, "Columna " + contColumna ,"<ERROR: Símbolo no definido>" , symbol.value ));
                         //Flag para registrar error solo una vez
                         continuaError = true;
                         break;
@@ -487,7 +526,7 @@ public class View_Main extends javax.swing.JFrame {
     }//GEN-LAST:event_jButton_SaveToFileActionPerformed
 
     private void jButton_SintaxAnalyzerActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton_SintaxAnalyzerActionPerformed
-        // TODO add your handling code here:
+        analizadorSintactico();
     }//GEN-LAST:event_jButton_SintaxAnalyzerActionPerformed
 
     /**

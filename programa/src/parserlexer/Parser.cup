@@ -58,11 +58,21 @@ terminal                        If, Else, While, For, Switch, Case, Default, Bre
 terminal                        Print, Read;
 
 /* ---------- NON TERMINALES ---------- */
-//Este non terminal es obligatorio, es la raiz de todas las reglas de produccion 
-non terminal program;
 
-// Declaración del símbolo inicial
-start with program;
+non terminal PROGRAM, VARIABLE_TYPE, VARIABLE_DECLARATION, EXPRESSION, VARIABLE_ASSIGNMENT, ARITHMETIC_OPERATOR, ARITHMETIC_EXPRESSION; 
+non terminal FUNCTION, FUNCTION_BODY;
 
-// Definición del no terminal inicial
-program ::= /* puede estar vacío o tener otras producciones */;
+// Declaración del non terminal inicial
+start with PROGRAM;
+
+// Definición del non terminal inicial
+PROGRAM ::= FUNCTION | Comment | Error | ;
+
+FUNCTION ::= VARIABLE_TYPE BlankSpace Identifier BlankSpace ParenthesisOpening BlankSpace ParenthesisClosure BlankSpace BlockOpening FUNCTION_BODY BlockClosure;
+
+VARIABLE_TYPE ::= Integer | Float | Bool | Char | String;
+
+FUNCTION_BODY ::= BlankSpace | NewLine ;
+
+
+
