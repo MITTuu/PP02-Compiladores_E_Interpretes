@@ -142,7 +142,7 @@ public class View_Main extends javax.swing.JFrame {
         String expr = jTextArea_Input.getText();
         jTextArea_Output.setForeground(Color.BLUE);
         if(expr.isEmpty()){
-            jTextArea_Output.setText("Lexical analysis completed: empty file.");
+            jTextArea_Output.setText("Análisis léxico completado: Archivo vacío.");
             return;
         }
         Lexer lexer = new Lexer(new StringReader(expr));
