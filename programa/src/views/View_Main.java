@@ -134,13 +134,10 @@ public class View_Main extends javax.swing.JFrame {
     }
 
     private void analizadorLexico() {
-       int contLinea = 1;
-       int contColumna = 1;
-       int lexemaLength = 0;
        boolean continuaError = false;
         // Obtiene el texto de entrada desde JTATextoArea
         String expr = jTextArea_Input.getText();
-        jTextArea_Output.setForeground(Color.BLUE);
+        jTextArea_Output.setForeground(Color.black);
         if(expr.isEmpty()){
             jTextArea_Output.setText("Análisis léxico completado: Archivo vacío.");
             return;
@@ -161,210 +158,187 @@ public class View_Main extends javax.swing.JFrame {
         // Linea de Titulos
         sb.append(String.format(formato, "LINEA / COLUMNA ", "SIMBOLO", "LEXEMA"));
         
-        // Primera Linea
-        sb.append(String.format(formato, "Linea " + contLinea , "", ""));
         try {
             while (true) {
-                //Tokens token = lexer.yylex();
                 Symbol symbol = lexer.next_token();
+                int numLine = symbol.right + 1;
+                int numColumn = symbol.left + 1;
                 if (symbol == null || symbol.value == null) {
                     // Guardar el resultado en un file             
                     jTextArea_Output.setText(sb.toString());
                     return;
                 }
-                //Registrar longitud de la cadena de caracteres del lexema para calcular la columna
-                lexemaLength = symbol.value.toString().length();
-                
+              
                 //Flag para registrar error solo una vez
                 if(continuaError && symbol.sym != sym.Error){
                     continuaError = false;
                 }
                 switch (symbol.sym) {
-                    case sym.NewLine:
-                        contLinea++;
-                        contColumna = 0;
-                        sb.append(String.format(formato, "Linea " + contLinea , "", ""));
-                        break;
                     case sym.BlockOpening:
-                        sb.append(String.format(formato, "Columna " + contColumna , "<Apertura de Bloque>" , symbol.value ));
+                        sb.append(String.format(formato, "Linea: " + numLine + " Columna: " + numColumn , "<Apertura de Bloque>" , symbol.value ));
                         break;
                     case sym.BlockClosure:
-                        sb.append(String.format(formato, "Columna " + contColumna , "<CierreBloque>" , symbol.value ));
+                        sb.append(String.format(formato, "Linea: " + numLine + " Columna: " + numColumn , "<CierreBloque>" , symbol.value ));
                         break;
                     case sym.Integer:
-                        sb.append(String.format(formato, "Columna " + contColumna , "<Integer>" , symbol.value ));
+                        sb.append(String.format(formato, "Linea: " + numLine + " Columna: " + numColumn , "<Integer>" , symbol.value ));
                         break;
                     case sym.Float:
-                        sb.append(String.format(formato, "Columna " + contColumna , "<Float>" , symbol.value ));
+                        sb.append(String.format(formato, "Linea: " + numLine + " Columna: " + numColumn , "<Float>" , symbol.value ));
                         break;
                     case sym.Bool:
-                       sb.append(String.format(formato, "Columna " + contColumna ,"<Bool>" , symbol.value ));
+                       sb.append(String.format(formato, "Linea: " + numLine + " Columna: " + numColumn ,"<Bool>" , symbol.value ));
                        break;
                     case sym.Char:
-                       sb.append(String.format(formato, "Columna " + contColumna ,"<Char>" , symbol.value ));
+                       sb.append(String.format(formato, "Linea: " + numLine + " Columna: " + numColumn ,"<Char>" , symbol.value ));
                        break;
                     case sym.String:
-                       sb.append(String.format(formato, "Columna " + contColumna ,"<String>" , symbol.value ));
+                       sb.append(String.format(formato, "Linea: " + numLine + " Columna: " + numColumn ,"<String>" , symbol.value ));
                        break;
                     case sym.Identifier:
-                       sb.append(String.format(formato, "Columna " + contColumna ,"<Identificador>" , symbol.value ));
+                       sb.append(String.format(formato, "Linea: " + numLine + " Columna: " + numColumn ,"<Identificador>" , symbol.value ));
                        break;
                     case sym.BracketOpening:
-                       sb.append(String.format(formato, "Columna " + contColumna ,"<CorcheteApertura>" , symbol.value ));
+                       sb.append(String.format(formato, "Linea: " + numLine + " Columna: " + numColumn ,"<CorcheteApertura>" , symbol.value ));
                        break;
                     case sym.BracketClosure:
-                       sb.append(String.format(formato, "Columna " + contColumna ,"<CorcheteCierre>" , symbol.value ));
+                       sb.append(String.format(formato, "Linea: " + numLine + " Columna: " + numColumn ,"<CorcheteCierre>" , symbol.value ));
                        break;
                     case sym.AssignmentSign:
-                       sb.append(String.format(formato, "Columna " + contColumna ,"<SignoAsignacion>" , symbol.value ));
+                       sb.append(String.format(formato, "Linea: " + numLine + " Columna: " + numColumn ,"<SignoAsignacion>" , symbol.value ));
                        break;
                     case sym.ParenthesisOpening:
-                       sb.append(String.format(formato, "Columna " + contColumna ,"<ParentesisApertura>" , symbol.value ));
+                       sb.append(String.format(formato, "Linea: " + numLine + " Columna: " + numColumn ,"<ParentesisApertura>" , symbol.value ));
                        break;
                     case sym.ParenthesisClosure:
-                       sb.append(String.format(formato, "Columna " + contColumna ,"<ParentesisApertura>" , symbol.value ));
+                       sb.append(String.format(formato, "Linea: " + numLine + " Columna: " + numColumn ,"<ParentesisApertura>" , symbol.value ));
                        break;
                     case sym.CharacterLiteral:
-                       sb.append(String.format(formato, "Columna " + contColumna ,"<LiteralCaracter>" , symbol.value ));
+                       sb.append(String.format(formato, "Linea: " + numLine + " Columna: " + numColumn ,"<LiteralCaracter>" , symbol.value ));
                        break;
                     case sym.StringLiteral:
-                       sb.append(String.format(formato, "Columna " + contColumna ,"<LiteralCadena>" , symbol.value ));
+                       sb.append(String.format(formato, "Linea: " + numLine + " Columna: " + numColumn ,"<LiteralCadena>" , symbol.value ));
                        break;
                     case sym.IntegerLiteral:
-                       sb.append(String.format(formato, "Columna " + contColumna ,"<LiteralEntero>" , symbol.value ));
+                       sb.append(String.format(formato, "Linea: " + numLine + " Columna: " + numColumn ,"<LiteralEntero>" , symbol.value ));
                        break;   
                     case sym.FloatLiteral:
-                       sb.append(String.format(formato, "Columna " + contColumna ,"<LiteralFlotante>" , symbol.value ));
+                       sb.append(String.format(formato, "Linea: " + numLine + " Columna: " + numColumn ,"<LiteralFlotante>" , symbol.value ));
                        break;
                     case sym.BoolLiteral:
-                       sb.append(String.format(formato, "Columna " + contColumna ,"<LiteralBool>" , symbol.value ));
+                       sb.append(String.format(formato, "Linea: " + numLine + " Columna: " + numColumn ,"<LiteralBool>" , symbol.value ));
                        break;                        
                     case sym.Sum:
-                       sb.append(String.format(formato, "Columna " + contColumna ,"<Suma>" , symbol.value ));
+                       sb.append(String.format(formato, "Linea: " + numLine + " Columna: " + numColumn ,"<Suma>" , symbol.value ));
                        break;
                     case sym.Subtraction:
-                       sb.append(String.format(formato, "Columna " + contColumna ,"<Resta>" , symbol.value ));
+                       sb.append(String.format(formato, "Linea: " + numLine + " Columna: " + numColumn ,"<Resta>" , symbol.value ));
                        break;
                     case sym.Division:
-                       sb.append(String.format(formato, "Columna " + contColumna ,"<Division>" , symbol.value ));
+                       sb.append(String.format(formato, "Linea: " + numLine + " Columna: " + numColumn ,"<Division>" , symbol.value ));
                        break;
                     case sym.Multiplication:
-                       sb.append(String.format(formato, "Columna " + contColumna ,"<Multiplicacion>" , symbol.value ));
+                       sb.append(String.format(formato, "Linea: " + numLine + " Columna: " + numColumn ,"<Multiplicacion>" , symbol.value ));
                        break;
                     case sym.Module:
-                       sb.append(String.format(formato, "Columna " + contColumna ,"<Modulo>" , symbol.value ));
+                       sb.append(String.format(formato, "Linea: " + numLine + " Columna: " + numColumn ,"<Modulo>" , symbol.value ));
                        break;
                     case sym.Power:
-                       sb.append(String.format(formato, "Columna " + contColumna ,"<Potencia>" , symbol.value ));
+                       sb.append(String.format(formato, "Linea: " + numLine + " Columna: " + numColumn ,"<Potencia>" , symbol.value ));
                        break;
                     case sym.Increment:
-                       sb.append(String.format(formato, "Columna " + contColumna ,"<Incremento>" , symbol.value ));
+                       sb.append(String.format(formato, "Linea: " + numLine + " Columna: " + numColumn ,"<Incremento>" , symbol.value ));
                        break;
                     case sym.Decrement:
-                       sb.append(String.format(formato, "Columna " + contColumna ,"<Decremento>" , symbol.value ));
+                       sb.append(String.format(formato, "Linea: " + numLine + " Columna: " + numColumn ,"<Decremento>" , symbol.value ));
                        break;
                     case sym.Negative:
-                       sb.append(String.format(formato, "Columna " + contColumna ,"<Negativo>" , symbol.value ));
+                       sb.append(String.format(formato, "Linea: " + numLine + " Columna: " + numColumn ,"<Negativo>" , symbol.value ));
                        break;
                     case sym.Less:
-                       sb.append(String.format(formato, "Columna " + contColumna ,"<Menor>" , symbol.value ));
+                       sb.append(String.format(formato, "Linea: " + numLine + " Columna: " + numColumn ,"<Menor>" , symbol.value ));
                        break;
                     case sym.LessEqual:
-                       sb.append(String.format(formato, "Columna " + contColumna ,"<MenorIgual>" , symbol.value ));
+                       sb.append(String.format(formato, "Linea: " + numLine + " Columna: " + numColumn ,"<MenorIgual>" , symbol.value ));
                        break;
                     case sym.Greater:
-                       sb.append(String.format(formato, "Columna " + contColumna ,"<Mayor>" , symbol.value ));
+                       sb.append(String.format(formato, "Linea: " + numLine + " Columna: " + numColumn ,"<Mayor>" , symbol.value ));
                        break;
                     case sym.GreaterEqual:
-                       sb.append(String.format(formato, "Columna " + contColumna ,"<MayorIgual>" , symbol.value ));
+                       sb.append(String.format(formato, "Linea: " + numLine + " Columna: " + numColumn ,"<MayorIgual>" , symbol.value ));
                        break;
                     case sym.Equal:
-                       sb.append(String.format(formato, "Columna " + contColumna ,"<Igual>" , symbol.value ));
+                       sb.append(String.format(formato, "Linea: " + numLine + " Columna: " + numColumn ,"<Igual>" , symbol.value ));
                        break;
                     case sym.NotEqual:
-                       sb.append(String.format(formato, "Columna " + contColumna ,"<Diferente>" , symbol.value ));
+                       sb.append(String.format(formato, "Linea: " + numLine + " Columna: " + numColumn ,"<Diferente>" , symbol.value ));
                        break;
                     case sym.Conjunction:
-                       sb.append(String.format(formato, "Columna " + contColumna ,"<Conjuncion>" , symbol.value ));
+                       sb.append(String.format(formato, "Linea: " + numLine + " Columna: " + numColumn ,"<Conjuncion>" , symbol.value ));
                        break;
                     case sym.Disjunction:
-                       sb.append(String.format(formato, "Columna " + contColumna ,"<Disyuncion>" , symbol.value ));
+                       sb.append(String.format(formato, "Linea: " + numLine + " Columna: " + numColumn ,"<Disyuncion>" , symbol.value ));
                        break;
                     case sym.Negation:
-                       sb.append(String.format(formato, "Columna " + contColumna ,"<Negacion>" , symbol.value ));
+                       sb.append(String.format(formato, "Linea: " + numLine + " Columna: " + numColumn ,"<Negacion>" , symbol.value ));
                        break;
                     case sym.If:
-                       sb.append(String.format(formato, "Columna " + contColumna ,"<If>" , symbol.value ));
+                       sb.append(String.format(formato, "Linea: " + numLine + " Columna: " + numColumn ,"<If>" , symbol.value ));
                        break;
                     case sym.Else:
-                       sb.append(String.format(formato, "Columna " + contColumna ,"<Else>" , symbol.value ));
+                       sb.append(String.format(formato, "Linea: " + numLine + " Columna: " + numColumn ,"<Else>" , symbol.value ));
                        break;
                     case sym.While:
-                       sb.append(String.format(formato, "Columna " + contColumna ,"<While>" , symbol.value ));
+                       sb.append(String.format(formato, "Linea: " + numLine + " Columna: " + numColumn ,"<While>" , symbol.value ));
                        break;
                     case sym.For:
-                       sb.append(String.format(formato, "Columna " + contColumna ,"<For>" , symbol.value ));
+                       sb.append(String.format(formato, "Linea: " + numLine + " Columna: " + numColumn ,"<For>" , symbol.value ));
                        break;
                     case sym.Switch:
-                       sb.append(String.format(formato, "Columna " + contColumna ,"<Switch>" , symbol.value ));
+                       sb.append(String.format(formato, "Linea: " + numLine + " Columna: " + numColumn ,"<Switch>" , symbol.value ));
                        break;
                     case sym.Case:
-                       sb.append(String.format(formato, "Columna " + contColumna ,"<Case>" , symbol.value ));
+                       sb.append(String.format(formato, "Linea: " + numLine + " Columna: " + numColumn ,"<Case>" , symbol.value ));
                        break;
                     case sym.Default:
-                       sb.append(String.format(formato, "Columna " + contColumna ,"<Default>" , symbol.value ));
+                       sb.append(String.format(formato, "Linea: " + numLine + " Columna: " + numColumn ,"<Default>" , symbol.value ));
                        break;
                     case sym.Break:
-                       sb.append(String.format(formato, "Columna " + contColumna ,"<Break>" , symbol.value ));
+                       sb.append(String.format(formato, "Linea: " + numLine + " Columna: " + numColumn ,"<Break>" , symbol.value ));
                        break;
                     case sym.Return:
-                       sb.append(String.format(formato, "Columna " + contColumna ,"<Return>" , symbol.value ));
+                       sb.append(String.format(formato, "Linea: " + numLine + " Columna: " + numColumn ,"<Return>" , symbol.value ));
                        break;
                     case sym.Colon:
-                       sb.append(String.format(formato, "Columna " + contColumna ,"<DosPuntos>" , symbol.value ));
+                       sb.append(String.format(formato, "Linea: " + numLine + " Columna: " + numColumn ,"<DosPuntos>" , symbol.value ));
                        break;
                     case sym.Print:
-                       sb.append(String.format(formato, "Columna " + contColumna ,"<Print>" , symbol.value ));
+                       sb.append(String.format(formato, "Linea: " + numLine + " Columna: " + numColumn ,"<Print>" , symbol.value ));
                        break;
                     case sym.Read:
-                       sb.append(String.format(formato, "Columna " + contColumna ,"<Read>" , symbol.value ));
-                       break;
-                    case sym.Comment:
-                       String valorSinSaltosComentario = symbol.value.toString().replaceAll("[\\r\\n]+", " "); 
-                       sb.append(String.format(formato, "Columna " + contColumna ,"<Comentario>" , valorSinSaltosComentario ));
-                       break;                    
+                       sb.append(String.format(formato, "Linea: " + numLine + " Columna: " + numColumn ,"<Read>" , symbol.value ));
+                       break;                  
                     case sym.EndSentence:
-                       sb.append(String.format(formato, "Columna " + contColumna ,"<FinSentencia>" , symbol.value ));
+                       sb.append(String.format(formato, "Linea: " + numLine + " Columna: " + numColumn ,"<FinSentencia>" , symbol.value ));
                        break;
                     case sym.Main:
-                       sb.append(String.format(formato, "Columna " + contColumna ,"<Main>" , symbol.value ));
+                       sb.append(String.format(formato, "Linea: " + numLine + " Columna: " + numColumn ,"<Main>" , symbol.value ));
                        break;
                     case sym.Comma:
-                       sb.append(String.format(formato, "Columna " + contColumna ,"<Coma>" , symbol.value ));
+                       sb.append(String.format(formato, "Linea: " + numLine + " Columna: " + numColumn ,"<Coma>" , symbol.value ));
                        break;                      
                     case sym.Error:
                         if(continuaError){
                             break;
                         }
-                        sb.append(String.format(formato, "Columna " + contColumna ,"<ERROR: Símbolo no definido>" , symbol.value ));
+                        sb.append(String.format(formato, "Linea: " + numLine + " Columna: " + numColumn ,"<ERROR: Símbolo no definido>" , symbol.value ));
                         //Flag para registrar error solo una vez
                         continuaError = true;
-                        break;
-                    case sym.BlankSpace:
-                        break;
-                    case sym.EndFile:
-                        sb.append(String.format(formato, "<FIN DE ARCHIVO>", "", ""));
-                        //Devuelve el resultado del texto analizado al alcanzar el fin del file
-                        jTextArea_Output.setText(sb.toString());
-                        System.out.print("\033[H\033[2J");  
-                        System.out.flush();  
-                        System.out.print(sb.toString());
-                        return;    
+                        break;  
                     default:
-                        sb.append(String.format(formato, "Columna " + contColumna , "Símbolo <no controlado>", symbol.value ));
+                        sb.append(String.format(formato, "Linea: " + numLine + " Columna: " + numColumn , "Símbolo <no controlado>", symbol.value ));
                         break;  
                 }
-                contColumna+= lexemaLength;
             }
         } catch (Exception e) {
             JOptionPane.showMessageDialog(null, "Error durante el análisis: " + e.getMessage());
@@ -450,12 +424,10 @@ public class View_Main extends javax.swing.JFrame {
             .addGroup(jPanel_BodyLayout.createSequentialGroup()
                 .addGap(35, 35, 35)
                 .addGroup(jPanel_BodyLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
+                    .addComponent(label_Titulo, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                    .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 550, Short.MAX_VALUE))
+                .addGroup(jPanel_BodyLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addGroup(jPanel_BodyLayout.createSequentialGroup()
-                        .addComponent(label_Titulo, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                        .addComponent(jButton_SaveToFile, javax.swing.GroupLayout.PREFERRED_SIZE, 142, javax.swing.GroupLayout.PREFERRED_SIZE))
-                    .addGroup(jPanel_BodyLayout.createSequentialGroup()
-                        .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 550, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addGroup(jPanel_BodyLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                             .addGroup(jPanel_BodyLayout.createSequentialGroup()
                                 .addGap(13, 13, 13)
@@ -467,7 +439,10 @@ public class View_Main extends javax.swing.JFrame {
                                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                                 .addComponent(jButton_SintaxAnalyzer)
                                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)))
-                        .addComponent(jScrollPane2, javax.swing.GroupLayout.PREFERRED_SIZE, 550, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                        .addComponent(jScrollPane2, javax.swing.GroupLayout.PREFERRED_SIZE, 550, javax.swing.GroupLayout.PREFERRED_SIZE))
+                    .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel_BodyLayout.createSequentialGroup()
+                        .addGap(576, 576, 576)
+                        .addComponent(jButton_SaveToFile, javax.swing.GroupLayout.PREFERRED_SIZE, 142, javax.swing.GroupLayout.PREFERRED_SIZE)))
                 .addContainerGap(35, Short.MAX_VALUE))
         );
         jPanel_BodyLayout.setVerticalGroup(

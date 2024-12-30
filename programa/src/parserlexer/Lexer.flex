@@ -54,118 +54,118 @@ newLine              = [\n]
 
 <YYINITIAL> {
     /* Identifier Main */
-    "_verano_"                      { return new Symbol(sym.Main, yychar, yyline, yytext()); }
+    "_verano_"                      { return new Symbol(sym.Main, yycolumn, yyline, yytext()); }
 
     /* Identifiers */
-    _[a-zA-Z0-9]+_                  { return new Symbol(sym.Identifier, yychar, yyline, yytext()); }
+    _[a-zA-Z0-9]+_                  { return new Symbol(sym.Identifier, yycolumn, yyline, yytext()); }
 
     /* Comments */
-    {Comment}                       { return new Symbol(sym.Comment, yychar, yyline, yytext()); }
+    {Comment}                       { /* Ignorará comentarios*/ }
     
     /* New line */
-    {newLine}                       { return new Symbol(sym.NewLine, yychar, yyline, yytext()); }
+    {newLine}                       { /* Ignorará nuevas lineas */ }
 
     /* Blank spaces */
-    {BlankSpace}+                   { return new Symbol(sym.BlankSpace, yychar, yyline, yytext()); }
+    {BlankSpace}+                   { /* Ignorará espacios en blanco */ }
 }
 
 <YYINITIAL, LITERALS> {
     /* Integer literal */
-    {integerLiteral}                { return new Symbol(sym.IntegerLiteral, yychar, yyline, yytext()); }
+    {integerLiteral}                { return new Symbol(sym.IntegerLiteral, yycolumn, yyline, yytext()); }
 
     /* Float literal */
-    {floatLiteral}                  { return new Symbol(sym.FloatLiteral, yychar, yyline, yytext()); }
+    {floatLiteral}                  { return new Symbol(sym.FloatLiteral, yycolumn, yyline, yytext()); }
 
     /* Boolean literal */
-    {boolLiteral}                   { return new Symbol(sym.BoolLiteral, yychar, yyline, yytext()); }
+    {boolLiteral}                   { return new Symbol(sym.BoolLiteral, yycolumn, yyline, yytext()); }
 
     /* Character literal */
-    {characterLiteral}              { return new Symbol(sym.CharacterLiteral, yychar, yyline, yytext()); }
+    {characterLiteral}              { return new Symbol(sym.CharacterLiteral, yycolumn, yyline, yytext()); }
 
     /* String literal */
-    {stringLiteral}                 { return new Symbol(sym.StringLiteral, yychar, yyline, yytext()); }
+    {stringLiteral}                 { return new Symbol(sym.StringLiteral, yycolumn, yyline, yytext()); }
 
 }
 
 <YYINITIAL, TYPES> {
-    "rodolfo"                       { return new Symbol(sym.Integer, yychar, yyline, yytext()); }
-    "bromista"                      { return new Symbol(sym.Float, yychar, yyline, yytext()); }
-    "trueno"                        { return new Symbol(sym.Bool, yychar, yyline, yytext()); }
-    "cupido"                        { return new Symbol(sym.Char, yychar, yyline, yytext()); }
-    "cometa"                        { return new Symbol(sym.String, yychar, yyline, yytext()); }
+    "rodolfo"                       { return new Symbol(sym.Integer, yycolumn, yyline, yytext()); }
+    "bromista"                      { return new Symbol(sym.Float, yycolumn, yyline, yytext()); }
+    "trueno"                        { return new Symbol(sym.Bool, yycolumn, yyline, yytext()); }
+    "cupido"                        { return new Symbol(sym.Char, yycolumn, yyline, yytext()); }
+    "cometa"                        { return new Symbol(sym.String, yycolumn, yyline, yytext()); }
 }
 
 <YYINITIAL, ARRAYS> {
     /* Unidimensional array for integer or char */
-    "abreempaque"                   { return new Symbol(sym.BracketOpening, yychar, yyline, yytext()); }
-    "cierraempaque"                 { return new Symbol(sym.BracketClosure, yychar, yyline, yytext()); }
+    "abreempaque"                   { return new Symbol(sym.BracketOpening, yycolumn, yyline, yytext()); }
+    "cierraempaque"                 { return new Symbol(sym.BracketClosure, yycolumn, yyline, yytext()); }
 }
 
 <YYINITIAL, OPERATORS> {
     /* Assignment sign */
-    "entrega"                       { return new Symbol(sym.AssignmentSign, yychar, yyline, yytext()); }
+    "entrega"                       { return new Symbol(sym.AssignmentSign, yycolumn, yyline, yytext()); }
 
     /* Parenthesis */
-    "abreregalo"                    { return new Symbol(sym.ParenthesisOpening, yychar, yyline, yytext()); }
-    "cierraregalo"                  { return new Symbol(sym.ParenthesisClosure, yychar, yyline, yytext()); }
+    "abreregalo"                    { return new Symbol(sym.ParenthesisOpening, yycolumn, yyline, yytext()); }
+    "cierraregalo"                  { return new Symbol(sym.ParenthesisClosure, yycolumn, yyline, yytext()); }
 
     /* Binary arithmetic expressions */
-    "navidad"                       { return new Symbol(sym.Sum, yychar, yyline, yytext()); }
-    "intercambio"                   { return new Symbol(sym.Subtraction, yychar, yyline, yytext()); }
-    "reyes"                         { return new Symbol(sym.Division, yychar, yyline, yytext()); }
-    "nochebuena"                    { return new Symbol(sym.Multiplication, yychar, yyline, yytext()); }
-    "magos"                         { return new Symbol(sym.Module, yychar, yyline, yytext()); }
-    "adviento"                      { return new Symbol(sym.Power, yychar, yyline, yytext()); }
+    "navidad"                       { return new Symbol(sym.Sum, yycolumn, yyline, yytext()); }
+    "intercambio"                   { return new Symbol(sym.Subtraction, yycolumn, yyline, yytext()); }
+    "reyes"                         { return new Symbol(sym.Division, yycolumn, yyline, yytext()); }
+    "nochebuena"                    { return new Symbol(sym.Multiplication, yycolumn, yyline, yytext()); }
+    "magos"                         { return new Symbol(sym.Module, yycolumn, yyline, yytext()); }
+    "adviento"                      { return new Symbol(sym.Power, yycolumn, yyline, yytext()); }
 
     /* Unary arithmetic expressions */
-    "quien"                         { return new Symbol(sym.Increment, yychar, yyline, yytext()); }
-    "grinch"                        { return new Symbol(sym.Decrement, yychar, yyline, yytext()); }
-    "-"                             { return new Symbol(sym.Negative, yychar, yyline, yytext()); } 
+    "quien"                         { return new Symbol(sym.Increment, yycolumn, yyline, yytext()); }
+    "grinch"                        { return new Symbol(sym.Decrement, yycolumn, yyline, yytext()); }
+    "-"                             { return new Symbol(sym.Negative, yycolumn, yyline, yytext()); } 
 
     /* Relational expressions */
-    "snowball"                      { return new Symbol(sym.Less, yychar, yyline, yytext()); }
-    "evergreen"                     { return new Symbol(sym.LessEqual, yychar, yyline, yytext()); }
-    "minstix"                       { return new Symbol(sym.Greater, yychar, yyline, yytext()); }
-    "upatree"                       { return new Symbol(sym.GreaterEqual, yychar, yyline, yytext()); }
-    "mary"                          { return new Symbol(sym.Equal, yychar, yyline, yytext()); }
-    "openslae"                      { return new Symbol(sym.NotEqual, yychar, yyline, yytext()); }
+    "snowball"                      { return new Symbol(sym.Less, yycolumn, yyline, yytext()); }
+    "evergreen"                     { return new Symbol(sym.LessEqual, yycolumn, yyline, yytext()); }
+    "minstix"                       { return new Symbol(sym.Greater, yycolumn, yyline, yytext()); }
+    "upatree"                       { return new Symbol(sym.GreaterEqual, yycolumn, yyline, yytext()); }
+    "mary"                          { return new Symbol(sym.Equal, yycolumn, yyline, yytext()); }
+    "openslae"                      { return new Symbol(sym.NotEqual, yycolumn, yyline, yytext()); }
 
     /* Logical expressions */
-    "melchior"                      { return new Symbol(sym.Conjunction, yychar, yyline, yytext()); }
-    "gaspar"                        { return new Symbol(sym.Disjunction, yychar, yyline, yytext()); }
-    "balthazar"                     { return new Symbol(sym.Negation, yychar, yyline, yytext()); }
+    "melchior"                      { return new Symbol(sym.Conjunction, yycolumn, yyline, yytext()); }
+    "gaspar"                        { return new Symbol(sym.Disjunction, yycolumn, yyline, yytext()); }
+    "balthazar"                     { return new Symbol(sym.Negation, yycolumn, yyline, yytext()); }
 }
 
 <YYINITIAL, BLOCKS> {
     /* Block opening  */
-    "abrecuento"                    { return new Symbol(sym.BlockOpening, yychar, yyline, yytext()); }
+    "abrecuento"                    { return new Symbol(sym.BlockOpening, yycolumn, yyline, yytext()); }
     
     /* Block closing */
-    "cierracuento"                  { return new Symbol(sym.BlockClosure, yychar, yyline, yytext()); }
+    "cierracuento"                  { return new Symbol(sym.BlockClosure, yycolumn, yyline, yytext()); }
 
     /* End sentence */
-    "finregalo"                     { return new Symbol(sym.EndSentence, yychar, yyline, yytext()); }
+    "finregalo"                     { return new Symbol(sym.EndSentence, yycolumn, yyline, yytext()); }
 }
 
 <YYINITIAL, CONTROL_STRUCTURES> {
-    "elfo"                          { return new Symbol(sym.If, yychar, yyline, yytext()); }
-    "hada"                          { return new Symbol(sym.Else, yychar, yyline, yytext()); }
-    "envuelve"                      { return new Symbol(sym.While, yychar, yyline, yytext()); }
-    "duende"                        { return new Symbol(sym.For, yychar, yyline, yytext()); }
-    "varios"                        { return new Symbol(sym.Switch, yychar, yyline, yytext()); }
-    "historia"                      { return new Symbol(sym.Case, yychar, yyline, yytext()); }
-    "ultimo"                        { return new Symbol(sym.Default, yychar, yyline, yytext()); }
-    "corta"                         { return new Symbol(sym.Break, yychar, yyline, yytext()); }
-    "envia"                         { return new Symbol(sym.Return, yychar, yyline, yytext()); }
-    "sigue"                         { return new Symbol(sym.Colon, yychar, yyline, yytext()); }
-    ","                             { return new Symbol(sym.Comma, yychar, yyline, yytext()); }
+    "elfo"                          { return new Symbol(sym.If, yycolumn, yyline, yytext()); }
+    "hada"                          { return new Symbol(sym.Else, yycolumn, yyline, yytext()); }
+    "envuelve"                      { return new Symbol(sym.While, yycolumn, yyline, yytext()); }
+    "duende"                        { return new Symbol(sym.For, yycolumn, yyline, yytext()); }
+    "varios"                        { return new Symbol(sym.Switch, yycolumn, yyline, yytext()); }
+    "historia"                      { return new Symbol(sym.Case, yycolumn, yyline, yytext()); }
+    "ultimo"                        { return new Symbol(sym.Default, yycolumn, yyline, yytext()); }
+    "corta"                         { return new Symbol(sym.Break, yycolumn, yyline, yytext()); }
+    "envia"                         { return new Symbol(sym.Return, yycolumn, yyline, yytext()); }
+    "sigue"                         { return new Symbol(sym.Colon, yycolumn, yyline, yytext()); }
+    ","                             { return new Symbol(sym.Comma, yycolumn, yyline, yytext()); }
 }
 
 <YYINITIAL, IO_OPERATORS> {
-    "narra"                         { return new Symbol(sym.Print, yychar, yyline, yytext()); }
-    "escucha"                       { return new Symbol(sym.Read, yychar, yyline, yytext()); }
+    "narra"                         { return new Symbol(sym.Print, yycolumn, yyline, yytext()); }
+    "escucha"                       { return new Symbol(sym.Read, yycolumn, yyline, yytext()); }
 
 }
 
     /* Error de analisis */
-    .                               { return new Symbol(sym.Error, yychar, yyline, yytext()); }
+    .                               { return new Symbol(sym.Error, yycolumn, yyline, yytext()); }

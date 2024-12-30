@@ -18,7 +18,7 @@ parser code
 /* TERMINALS */
 
 /* ---------- General ---------- */
-terminal                        Main, Identifier, Comment, NewLine, BlankSpace, EndFile, Error;
+terminal                        Main, Identifier, Error;
 
 /* ---------- Literals ---------- */
 terminal                        IntegerLiteral, FloatLiteral, BoolLiteral, CharacterLiteral, StringLiteral;
@@ -60,19 +60,11 @@ terminal                        Print, Read;
 /* ---------- NON TERMINALES ---------- */
 
 non terminal PROGRAM, VARIABLE_TYPE, VARIABLE_DECLARATION, EXPRESSION, VARIABLE_ASSIGNMENT, ARITHMETIC_OPERATOR, ARITHMETIC_EXPRESSION; 
-non terminal FUNCTION, FUNCTION_BODY;
 
 // Declaración del non terminal inicial
 start with PROGRAM;
 
 // Definición del non terminal inicial
-PROGRAM ::= FUNCTION | Comment | Error | ;
-
-FUNCTION ::= VARIABLE_TYPE BlankSpace Identifier BlankSpace ParenthesisOpening BlankSpace ParenthesisClosure BlankSpace BlockOpening FUNCTION_BODY BlockClosure;
-
-VARIABLE_TYPE ::= Integer | Float | Bool | Char | String;
-
-FUNCTION_BODY ::= BlankSpace | NewLine ;
-
+PROGRAM ::= /*Vacío*/;
 
 
