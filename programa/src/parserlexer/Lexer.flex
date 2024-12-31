@@ -131,7 +131,7 @@ newLine              = [\n]
     "openslae"                      { return new Symbol(sym.NotEqual, yycolumn, yyline, yytext()); }
 
     /* Logical expressions */
-    "melchior"                      { return new Symbol(sym.Conjunction, yycolumn, yyline, yytext()); }
+    "melchor"                      { return new Symbol(sym.Conjunction, yycolumn, yyline, yytext()); }
     "gaspar"                        { return new Symbol(sym.Disjunction, yycolumn, yyline, yytext()); }
     "balthazar"                     { return new Symbol(sym.Negation, yycolumn, yyline, yytext()); }
 }

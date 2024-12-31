@@ -40,7 +40,10 @@ terminal                        ParenthesisOpening, ParenthesisClosure;
 terminal                        Sum, Subtraction, Division, Multiplication, Module, Power;
 
 // Unary Arithmetic Operators
-terminal                        Increment, Decrement, Negative;
+terminal                        Increment, Decrement;
+
+//Negative operator
+terminal                        Negative;
 
 // Relational Operators
 terminal                        Less, LessEqual, Greater, GreaterEqual, Equal, NotEqual;
@@ -59,12 +62,52 @@ terminal                        Print, Read;
 
 /* ---------- NON TERMINALES ---------- */
 
-non terminal PROGRAM, VARIABLE_TYPE, VARIABLE_DECLARATION, EXPRESSION, VARIABLE_ASSIGNMENT, ARITHMETIC_OPERATOR, ARITHMETIC_EXPRESSION; 
+non terminal PROGRAM, VARIABLE_TYPE, VARIABLE_DECLARATION, EXPRESSION, VARIABLE_ASSIGNMENT, BINARY_ARITHMETIC_OPERATOR, UNARY_ARITHMETIC_OPERATOR, ARITHMETIC_EXPRESSION;
+non terminal NEGATIVE_OPERATOR; 
+non terminal FUNCTION_DECLARATION,FUNCTION_CALL;
 
 // Declaración del non terminal inicial
 start with PROGRAM;
 
 // Definición del non terminal inicial
-PROGRAM ::= /*Vacío*/;
+PROGRAM ::=
+        /* Vacío */ |  
+        PROGRAM VARIABLE_TYPE |
+        PROGRAM BINARY_ARITHMETIC_OPERATOR|
+        PROGRAM UNARY_ARITHMETIC_OPERATOR|
+        PROGRAM NEGATIVE_OPERATOR
+        ;
+
+ VARIABLE_TYPE ::= Integer | Float | String | Bool | Char ;
+
+BINARY_ARITHMETIC_OPERATOR ::= Sum | Subtraction | Multiplication | Division |  Module | Power;
+
+UNARY_ARITHMETIC_OPERATOR ::= Increment | Decrement;
+
+NEGATIVE_OPERATOR ::= Negative; 
+
+
+
+
+
+
+
+
+
+
+
+
+// PARAMETER_LIST ::=  /* Vacío */ | VARIABLE_TYPE Identifier | VARIABLE_TYPE Identifier Comma PARAMETER_LIST;
+
+// VARIABLE_DECLARATION ::= VARIABLE_TYPE Identifier EndSentence | VARIABLE_TYPE Identifier AssignmentSign EXPRESSION EndSentence;
+
+// VARIABLE_ASSIGNMENT ::= Identifier AssignmentSign EXPRESSION EndSentence;
+
+// EXPRESSION ::= IntegerLiteral | FloatLiteral | StringLiteral | ARITHMETIC_EXPRESSION | FUNCTION_CALL;
+
+// ARITHMETIC_EXPRESSION ::= EXPRESSION ARITHMETIC_OPERATOR EXPRESSION;
+// FUNCTION_DECLARATION ::= VARIABLE_TYPE Identifier ParenthesisOpening PARAMETER_LIST ParenthesisClosure BlockOpening BlockClosure;
+
+// FUNCTION_CALL ::= Identifier ParenthesisOpening PARAMETER_LIST ParenthesisClosure EndSentence;
 
 
