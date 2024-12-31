@@ -63,8 +63,9 @@ terminal                        Print, Read;
 /* ---------- NON TERMINALES ---------- */
 
 non terminal PROGRAM, VARIABLE_TYPE, VARIABLE_DECLARATION, EXPRESSION, VARIABLE_ASSIGNMENT, BINARY_ARITHMETIC_OPERATOR, UNARY_ARITHMETIC_OPERATOR, ARITHMETIC_EXPRESSION;
-non terminal NEGATIVE_OPERATOR, PARAMETER, PARAMETER_LIST; 
-non terminal FUNCTION_DECLARATION,FUNCTION_CALL;
+non terminal NEGATIVE_OPERATOR, PARAMETER_DECLARATION, PARAMETER_DECLARATION_LIST, PARAMETER_DECLARATION_OPTION; 
+non terminal FUNCTION_DECLARATION,FUNCTION_CALL, FUNCTION_CALL_PARAMETER, FUNCTION_CALL_PARAMETER_LIST, FUNCTION_CALL_PARAMETER_OPTION, LITERALS ;
+non terminal FUNCTION_DECLARATION_BODY;
 
 // Declaración del non terminal inicial
 start with PROGRAM;
@@ -72,14 +73,12 @@ start with PROGRAM;
 // Definición del non terminal inicial
 PROGRAM ::=
         /* Vacío */ |  
-        PROGRAM VARIABLE_TYPE |
-        PROGRAM BINARY_ARITHMETIC_OPERATOR|
-        PROGRAM UNARY_ARITHMETIC_OPERATOR|
-        PROGRAM NEGATIVE_OPERATOR |
-        PROGRAM PARAMETER_LIST
+        FUNCTION_CALL |
+        FUNCTION_DECLARATION
         ;
 
 VARIABLE_TYPE ::= Integer | Float | String | Bool | Char ;
+
 
 BINARY_ARITHMETIC_OPERATOR ::= Sum | Subtraction | Multiplication | Division |  Module | Power;
 
@@ -87,15 +86,42 @@ UNARY_ARITHMETIC_OPERATOR ::= Increment | Decrement;
 
 NEGATIVE_OPERATOR ::= Negative; 
 
-PARAMETER::= VARIABLE_TYPE Identifier;
+LITERALS ::= IntegerLiteral | FloatLiteral | BoolLiteral | CharacterLiteral | StringLiteral ;
 
-PARAMETER_LIST ::=  PARAMETER |
-                    PARAMETER Comma PARAMETER_LIST
+FUNCTION_CALL_PARAMETER ::= 
+                            Identifier |
+                            LITERALS
+                            ;
+
+FUNCTION_CALL_PARAMETER_LIST ::= 
+                            FUNCTION_CALL_PARAMETER |
+                            FUNCTION_CALL_PARAMETER Comma FUNCTION_CALL_PARAMETER_LIST
+                            ;
+
+FUNCTION_CALL_PARAMETER_OPTION ::=  
+                                /* Vacío */ |
+                                FUNCTION_CALL_PARAMETER_LIST
+                                ;
+
+FUNCTION_CALL ::= Identifier ParenthesisOpening FUNCTION_CALL_PARAMETER_OPTION  ParenthesisClosure EndSentence;
+
+PARAMETER_DECLARATION::= VARIABLE_TYPE Identifier;
+
+PARAMETER_DECLARATION_LIST ::=  
+                    PARAMETER_DECLARATION |
+                    PARAMETER_DECLARATION Comma PARAMETER_DECLARATION_LIST
                     ;
 
+PARAMETER_DECLARATION_OPTION ::= 
+                    /* Vacío */ |
+                    PARAMETER_DECLARATION_LIST
+                    ;
 
+FUNCTION_DECLARATION_BODY ::= 
+                    /* Vacío */
+                    ;
 
-
+FUNCTION_DECLARATION ::= VARIABLE_TYPE Identifier ParenthesisOpening PARAMETER_DECLARATION_OPTION ParenthesisClosure BlockOpening FUNCTION_DECLARATION_BODY BlockClosure;
 
 
 
@@ -111,8 +137,8 @@ PARAMETER_LIST ::=  PARAMETER |
 // EXPRESSION ::= IntegerLiteral | FloatLiteral | StringLiteral | ARITHMETIC_EXPRESSION | FUNCTION_CALL;
 
 // ARITHMETIC_EXPRESSION ::= EXPRESSION ARITHMETIC_OPERATOR EXPRESSION;
-// FUNCTION_DECLARATION ::= VARIABLE_TYPE Identifier ParenthesisOpening PARAMETER_LIST ParenthesisClosure BlockOpening BlockClosure;
 
-// FUNCTION_CALL ::= Identifier ParenthesisOpening PARAMETER_LIST ParenthesisClosure EndSentence;
+
+
 
 
