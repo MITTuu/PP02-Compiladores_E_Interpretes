@@ -1,15 +1,39 @@
 package parserlexer;
 
 import java_cup.runtime.Symbol;
+import java.util.ArrayList;
+import java.util.List;
 
 parser code
 {:
     private Symbol s;
-     
+    
+    //Lista de errores controlados
+    private List<String> errorList = new ArrayList<>();
+    
+
+    // Agrega errores controlados a la lista
+    public void logError(Symbol s) {
+        String error = "Error léxico: Linea: " + (s.right + 1) + " Columna: " + (s.left + 1) + ", Texto: \"" + s.value + "\"";
+        errorList.add(error);
+    }
+
+    // Obtiene la lista de errores controlados
+    public List<String> getErrorList() {
+        return errorList;
+    }
+
+    // Gestiona errores recuperables -error-
     public void syntax_error(Symbol s){
         this.s = s;
-    }   
+    }
 
+    // Gestiona errores no recuperables
+    public void unrecovered_syntax_error(Symbol s) throws java.lang.Exception {
+        //TODO
+    }
+
+    // Método para obtener el Symbol donde se generó el error.
     public Symbol getS(){
         return this.s;
     }
@@ -62,7 +86,7 @@ terminal                        Print, Read;
 
 /* ---------- NON TERMINALES ---------- */
 
-non terminal PROGRAM, VARIABLE_TYPE, VARIABLE_DECLARATION, EXPRESSION, VARIABLE_ASSIGNMENT, BINARY_ARITHMETIC_OPERATOR, UNARY_ARITHMETIC_OPERATOR, ARITHMETIC_EXPRESSION;
+non terminal PROGRAM, ERROR, VARIABLE_TYPE, VARIABLE_DECLARATION, EXPRESSION, VARIABLE_ASSIGNMENT, BINARY_ARITHMETIC_OPERATOR, UNARY_ARITHMETIC_OPERATOR, ARITHMETIC_EXPRESSION;
 non terminal NEGATIVE_OPERATOR, PARAMETER_DECLARATION, PARAMETER_DECLARATION_LIST, PARAMETER_DECLARATION_OPTION; 
 non terminal FUNCTION_DECLARATION,FUNCTION_CALL, FUNCTION_CALL_PARAMETER, FUNCTION_CALL_PARAMETER_LIST, FUNCTION_CALL_PARAMETER_OPTION, LITERALS ;
 non terminal FUNCTION_DECLARATION_BODY;
@@ -72,10 +96,17 @@ start with PROGRAM;
 
 // Definición del non terminal inicial
 PROGRAM ::=
-        /* Vacío */ |  
-        FUNCTION_CALL |
-        FUNCTION_DECLARATION
+        /* Vacío */ |
+        PROGRAM ERROR |
+        PROGRAM FUNCTION_CALL |
+        PROGRAM FUNCTION_DECLARATION 
         ;
+
+ERROR ::= Error:e
+    {:  
+        Symbol s = (Symbol)CUP$Parser$stack.peek();
+        parser.logError(s);
+    :};
 
 VARIABLE_TYPE ::= Integer | Float | String | Bool | Char ;
 

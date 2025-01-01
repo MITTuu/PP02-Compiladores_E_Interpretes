@@ -1,5 +1,7 @@
 package parserlexer;
 import java_cup.runtime.*;
+import java.util.ArrayList;
+import java.util.List;
 %%
 
 %public
@@ -25,6 +27,15 @@ import java_cup.runtime.*;
     }
     private Symbol symbol(int type){
         return new Symbol(type, yyline, yycolumn);
+    }
+    
+    //Lista de errores controlados
+    public List<String> lexErrorList = new ArrayList<>();
+    
+    // Agrega errores controlados a la lista
+    public void logError(int column,int line,String text) {
+        String error = "Error léxico: Linea: " + (line + 1) + " Columna: " + (column + 1) + ", Texto: \"" + text + "\"";
+        lexErrorList.add(error);
     }
 %}
 
@@ -131,7 +142,7 @@ newLine              = [\n]
     "openslae"                      { return new Symbol(sym.NotEqual, yycolumn, yyline, yytext()); }
 
     /* Logical expressions */
-    "melchor"                      { return new Symbol(sym.Conjunction, yycolumn, yyline, yytext()); }
+    "melchor"                       { return new Symbol(sym.Conjunction, yycolumn, yyline, yytext()); }
     "gaspar"                        { return new Symbol(sym.Disjunction, yycolumn, yyline, yytext()); }
     "balthazar"                     { return new Symbol(sym.Negation, yycolumn, yyline, yytext()); }
 }
@@ -168,4 +179,4 @@ newLine              = [\n]
 }
 
     /* Error de analisis */
-    .                               { return new Symbol(sym.Error, yycolumn, yyline, yytext()); }
+    .                               { logError(yycolumn, yyline, yytext());}

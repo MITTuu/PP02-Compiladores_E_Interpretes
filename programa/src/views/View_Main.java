@@ -16,6 +16,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import java_cup.runtime.Scanner;
 import java_cup.runtime.Symbol;
 import javax.swing.JFileChooser;
 import javax.swing.JOptionPane;
@@ -109,25 +110,31 @@ public class View_Main extends javax.swing.JFrame {
     private void analizadorSintactico(){
         String expr = jTextArea_Input.getText();
 
-        List<String> errores = new ArrayList<>();
-        
-        // Variable para controlar el ciclo de análisis
-        int inicioAnalisis = 0;
-        boolean analizando = true;
-        int linea = 0;
-        int columna = 0;
-        
-        // Obtener el texto a analizar, comenzando desde el índice actual
-            String textoAnalizar = expr.substring(inicioAnalisis);
-        Parser parser = new Parser(new Lexer(new StringReader(textoAnalizar)));
+        Parser parser = new Parser(new Lexer(new StringReader(expr)));
 
         try {
             parser.parse();
-            jTextArea_Output.setText("Analisis realizado correctamente");
-            jTextArea_Output.setForeground(new Color(25, 111, 61));
+            
+             Lexer s =  (Lexer) parser.getScanner();
+            
+            List<String> lexErrorList = s.lexErrorList;
+            // Obtener los errores acumulados
+            List<String> errorList = parser.getErrorList();
+
+            if (errorList.isEmpty()) {
+                jTextArea_Output.setText("Análisis realizado correctamente");
+                jTextArea_Output.setForeground(new Color(25, 111, 61));
+            } else {
+                StringBuilder mensajeErrores = new StringBuilder("Errores encontrados:\n");
+                for (String error : errorList) {
+                    mensajeErrores.append(error).append("\n");
+                }
+                jTextArea_Output.setText(mensajeErrores.toString());
+                jTextArea_Output.setForeground(Color.red);
+            }
         } catch (Exception ex) {
             Symbol sym = parser.getS();
-            jTextArea_Output.setText("Error de sintaxis. Linea: " + (sym.right + 1) + " Columna: " + (sym.left + 1) + ", Texto: \"" + sym.value + "\"");
+            jTextArea_Output.setText("Error crítico de sintaxis. Linea: " + (sym.right + 1) + " Columna: " + (sym.left + 1) + ", Texto: \"" + sym.value + "\"");
             jTextArea_Output.setForeground(Color.red);
         }
 
@@ -165,6 +172,7 @@ public class View_Main extends javax.swing.JFrame {
                 int numLine = symbol.right + 1;
                 int numColumn = symbol.left + 1;
                 if (symbol == null || symbol.value == null) {
+                    String errores = lexer.lexErrorList.toString();
                     // Guardar el resultado en un file             
                     jTextArea_Output.setText(sb.toString());
                     return;
