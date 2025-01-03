@@ -117,18 +117,32 @@ public class View_Main extends javax.swing.JFrame {
             
              Lexer s =  (Lexer) parser.getScanner();
             
-            List<String> lexErrorList = s.lexErrorList;
+            List<Symbol> lexErrorList = s.lexErrorList;
             // Obtener los errores acumulados
             List<String> errorList = parser.getErrorList();
 
-            if (errorList.isEmpty()) {
-                jTextArea_Output.setText("Análisis realizado correctamente");
+            if (errorList.isEmpty() && lexErrorList.isEmpty() ) {
+                jTextArea_Output.setText("Análisis Sintáctico realizado correctamente");
                 jTextArea_Output.setForeground(new Color(25, 111, 61));
             } else {
-                StringBuilder mensajeErrores = new StringBuilder("Errores encontrados:\n");
-                for (String error : errorList) {
-                    mensajeErrores.append(error).append("\n");
+                StringBuilder mensajeErrores = new StringBuilder("ERRORES ENCONTRADOS:\n");
+                if(!lexErrorList.isEmpty()) {
+                    mensajeErrores.append("\n\n");
+                    mensajeErrores.append("Errores léxicos:").append("\n");
+                    
+                    for (Symbol sym: lexErrorList){
+                        mensajeErrores.append("Linea: " + (sym.right + 1) + " Columna: " + (sym.left + 1) + ", Texto: \"" + sym.value + "\"").append("\n");
+                    }
+                }                
+                
+                if(!errorList.isEmpty()) {
+                    mensajeErrores.append("\n\n");
+                    mensajeErrores.append("Errores sintácticos:").append("\n");
+                    for (String error : errorList) {
+                        mensajeErrores.append(error).append("\n");
+                    }
                 }
+                
                 jTextArea_Output.setText(mensajeErrores.toString());
                 jTextArea_Output.setForeground(Color.red);
             }
@@ -172,8 +186,19 @@ public class View_Main extends javax.swing.JFrame {
                 int numLine = symbol.right + 1;
                 int numColumn = symbol.left + 1;
                 if (symbol == null || symbol.value == null) {
-                    String errores = lexer.lexErrorList.toString();
-                    // Guardar el resultado en un file             
+                    
+                    //Obtiene la lista de errores y los contaten al final del documento.
+                    List<Symbol> lexErrorList = lexer.lexErrorList;
+                    
+                    if(!lexErrorList.isEmpty()) {
+                        sb.append("\n\n");
+                        sb.append("Errores léxicos:").append("\n");
+
+                        for (Symbol sym: lexErrorList){
+                            sb.append("Linea: " + (sym.right + 1) + " Columna: " + (sym.left + 1) + ", Texto: \"" + sym.value + "\"").append("\n");
+                        }
+                }    
+                    
                     jTextArea_Output.setText(sb.toString());
                     return;
                 }

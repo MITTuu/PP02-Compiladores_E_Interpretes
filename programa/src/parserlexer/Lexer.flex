@@ -30,12 +30,12 @@ import java.util.List;
     }
     
     //Lista de errores controlados
-    public List<String> lexErrorList = new ArrayList<>();
+    public List<Symbol> lexErrorList = new ArrayList<>();
     
     // Agrega errores controlados a la lista
     public void logError(int column,int line,String text) {
-        String error = "Error léxico: Linea: " + (line + 1) + " Columna: " + (column + 1) + ", Texto: \"" + text + "\"";
-        lexErrorList.add(error);
+        Symbol symbol = new Symbol(sym.Error, column, line, text);
+        lexErrorList.add(symbol);
     }
 %}
 

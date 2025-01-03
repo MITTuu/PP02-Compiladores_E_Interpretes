@@ -14,7 +14,7 @@ parser code
 
     // Agrega errores controlados a la lista
     public void logError(Symbol s) {
-        String error = "Error léxico: Linea: " + (s.right + 1) + " Columna: " + (s.left + 1) + ", Texto: \"" + s.value + "\"";
+        String error = "Error cerca de Linea: " + (s.right + 1) + " Columna: " + (s.left + 1) + ", Texto: \"" + s.value + "\"";
         errorList.add(error);
     }
 
@@ -26,16 +26,24 @@ parser code
     // Gestiona errores recuperables -error-
     public void syntax_error(Symbol s){
         this.s = s;
+        logError(s);
     }
 
     // Gestiona errores no recuperables
     public void unrecovered_syntax_error(Symbol s) throws java.lang.Exception {
-        //TODO
+        String error = "\nError no recuperable:\n No se encontró final de sentencia (finregalo), \n o no se encontró final de bloque (cierracuento) \n o se determinó un error desconocido ";
+        errorList.add(error);
     }
 
     // Método para obtener el Symbol donde se generó el error.
     public Symbol getS(){
         return this.s;
+    }
+
+    //Método para salida por consolda
+    public void print(String prodName, Symbol s){
+         String salida = "Encontrado " +prodName+ " : cerca de Linea: " + (s.right + 1) + " Columna: " + (s.left + 1) + ", Texto: \"" + s.value + "\"";
+         System.out.println(salida); 
     }
 :};
 
@@ -97,16 +105,12 @@ start with PROGRAM;
 // Definición del non terminal inicial
 PROGRAM ::=
         /* Vacío */ |
-        PROGRAM ERROR |
-        PROGRAM FUNCTION_CALL |
-        PROGRAM FUNCTION_DECLARATION 
+        PROGRAM FUNCTION_DECLARATION |
+        PROGRAM error EndSentence {:Symbol s = (Symbol)CUP$Parser$stack.peek(); parser.print("EndSentence",s); :} |
+        PROGRAM error BlockClosure {:Symbol s = (Symbol)CUP$Parser$stack.peek(); parser.print("BlockClosure",s); :}
         ;
 
-ERROR ::= Error:e
-    {:  
-        Symbol s = (Symbol)CUP$Parser$stack.peek();
-        parser.logError(s);
-    :};
+
 
 VARIABLE_TYPE ::= Integer | Float | String | Bool | Char ;
 
@@ -126,7 +130,7 @@ FUNCTION_CALL_PARAMETER ::=
 
 FUNCTION_CALL_PARAMETER_LIST ::= 
                             FUNCTION_CALL_PARAMETER |
-                            FUNCTION_CALL_PARAMETER Comma FUNCTION_CALL_PARAMETER_LIST
+                            FUNCTION_CALL_PARAMETER Comma FUNCTION_CALL_PARAMETER_LIST 
                             ;
 
 FUNCTION_CALL_PARAMETER_OPTION ::=  
@@ -140,7 +144,7 @@ PARAMETER_DECLARATION::= VARIABLE_TYPE Identifier;
 
 PARAMETER_DECLARATION_LIST ::=  
                     PARAMETER_DECLARATION |
-                    PARAMETER_DECLARATION Comma PARAMETER_DECLARATION_LIST
+                    PARAMETER_DECLARATION Comma PARAMETER_DECLARATION_LIST 
                     ;
 
 PARAMETER_DECLARATION_OPTION ::= 
@@ -148,16 +152,12 @@ PARAMETER_DECLARATION_OPTION ::=
                     PARAMETER_DECLARATION_LIST
                     ;
 
-FUNCTION_DECLARATION_BODY ::= 
-                    /* Vacío */
-                    ;
-
 FUNCTION_DECLARATION ::= VARIABLE_TYPE Identifier ParenthesisOpening PARAMETER_DECLARATION_OPTION ParenthesisClosure BlockOpening FUNCTION_DECLARATION_BODY BlockClosure;
 
 
-
-
-
+FUNCTION_DECLARATION_BODY ::= 
+                    /* Vacío */
+                    ;
 
 
 
