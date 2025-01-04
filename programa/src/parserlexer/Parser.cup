@@ -97,7 +97,8 @@ terminal                        Print, Read;
 non terminal PROGRAM, VARIABLE_TYPE, VARIABLE_DECLARATION, VARIABLE_ASSIGNMENT;
 non terminal NEGATIVE_OPERATOR, PARAMETER_DECLARATION, PARAMETER_DECLARATION_LIST, PARAMETER_DECLARATION_OPTION; 
 non terminal FUNCTION_DECLARATION,FUNCTION_CALL, FUNCTION_CALL_PARAMETER, FUNCTION_CALL_PARAMETER_LIST, FUNCTION_CALL_PARAMETER_OPTION, LITERALS ;
-non terminal FUNCTION_DECLARATION_BODY, EXPRESSION, BINARY_ARITHMETIC_OPERATOR, UNARY_ARITHMETIC_OPERATOR, ARITHMETIC_EXPRESSION, SIMPLE_EXPRESSION, EXPRESSION_LIST;
+non terminal FUNCTION_DECLARATION_BODY, EXPRESSION, BINARY_ARITHMETIC_OPERATOR, UNARY_ARITHMETIC_OPERATOR, ARITHMETIC_EXPRESSION, SIMPLE_EXPRESSION;
+non terminal FUNCTION_BODY_ELEMENT;
 
 // Declaración del non terminal inicial
 start with PROGRAM;
@@ -105,13 +106,25 @@ start with PROGRAM;
 // Definición del non terminal inicial
 PROGRAM ::=
         /* Vacío */ |
-        EXPRESSION |
-       // PROGRAM FUNCTION_DECLARATION |
+        PROGRAM FUNCTION_DECLARATION |
         PROGRAM error EndSentence {:Symbol s = (Symbol)CUP$Parser$stack.peek(); parser.print("EndSentence",s); :} |
         PROGRAM error BlockClosure {:Symbol s = (Symbol)CUP$Parser$stack.peek(); parser.print("BlockClosure",s); :}
         ;
 
+FUNCTION_DECLARATION ::= VARIABLE_TYPE Identifier ParenthesisOpening PARAMETER_DECLARATION_OPTION ParenthesisClosure BlockOpening FUNCTION_DECLARATION_BODY BlockClosure;
 
+
+FUNCTION_DECLARATION_BODY ::= 
+                    FUNCTION_BODY_ELEMENT |
+                    FUNCTION_DECLARATION_BODY FUNCTION_BODY_ELEMENT |
+                    FUNCTION_DECLARATION_BODY error EndSentence {:Symbol s = (Symbol)CUP$Parser$stack.peek(); parser.print("EndSentence",s); :}
+                    ;
+
+FUNCTION_BODY_ELEMENT ::=
+                        VARIABLE_DECLARATION |
+                        VARIABLE_ASSIGNMENT |
+                        FUNCTION_CALL 
+                        ;
 
 VARIABLE_TYPE ::= Integer | Float | String | Bool | Char ;
 
@@ -153,26 +166,20 @@ PARAMETER_DECLARATION_OPTION ::=
                     PARAMETER_DECLARATION_LIST
                     ;
 
-FUNCTION_DECLARATION ::= VARIABLE_TYPE Identifier ParenthesisOpening PARAMETER_DECLARATION_OPTION ParenthesisClosure BlockOpening FUNCTION_DECLARATION_BODY BlockClosure;
-
-
-FUNCTION_DECLARATION_BODY ::= 
-                    /* Vacío */
+SIMPLE_EXPRESSION ::= 
+                    LITERALS | 
+                    FUNCTION_CALL 
                     ;
-
-SIMPLE_EXPRESSION ::= LITERALS | FUNCTION_CALL ;
 
 ARITHMETIC_EXPRESSION ::= SIMPLE_EXPRESSION BINARY_ARITHMETIC_OPERATOR EXPRESSION;
 
 EXPRESSION ::= SIMPLE_EXPRESSION | ARITHMETIC_EXPRESSION;
 
-//VARIABLE_DECLARATION ::= VARIABLE_TYPE Identifier EndSentence | VARIABLE_TYPE Identifier AssignmentSign EXPRESSION EndSentence;
+VARIABLE_DECLARATION ::= VARIABLE_TYPE Identifier EndSentence |
+                         VARIABLE_TYPE Identifier AssignmentSign EXPRESSION EndSentence
+                        ;
 
-// VARIABLE_ASSIGNMENT ::= Identifier AssignmentSign EXPRESSION EndSentence;
-
- 
-
-
+VARIABLE_ASSIGNMENT ::= Identifier AssignmentSign EXPRESSION EndSentence;
 
 
 
