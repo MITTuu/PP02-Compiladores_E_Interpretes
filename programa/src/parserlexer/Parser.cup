@@ -97,6 +97,8 @@ terminal                        Print, Read;
 non terminal PROGRAM, VARIABLE_TYPE, VARIABLE_DECLARATION, VARIABLE_ASSIGNMENT;
 non terminal NEGATIVE_OPERATOR, PARAMETER_DECLARATION, PARAMETER_DECLARATION_LIST, PARAMETER_DECLARATION_OPTION; 
 non terminal FUNCTION_DECLARATION,FUNCTION_CALL, FUNCTION_CALL_PARAMETER, FUNCTION_CALL_PARAMETER_LIST, FUNCTION_CALL_PARAMETER_OPTION, LITERALS ;
+non terminal FUNCTION_DECLARATION_BODY, EXPRESSION, BINARY_ARITHMETIC_OPERATOR, ARITHMETIC_EXPRESSION, SIMPLE_EXPRESSION;
+non terminal FUNCTION_BODY_ELEMENT, NEGATIVE_LITERAL, UNARY_ARITHMETIC_EXPRESSION;
 non terminal FUNCTION_DECLARATION_BODY, EXPRESSION, BINARY_ARITHMETIC_OPERATOR, UNARY_ARITHMETIC_OPERATOR, ARITHMETIC_EXPRESSION, SIMPLE_EXPRESSION;
 non terminal FUNCTION_BODY_ELEMENT, CONTROL_STRUCTURE, IF_STRUCTURE, WHILE_STRUCTURE, FOR_STRUCTURE, SWITCH_STRUCTURE,CASES, CASE, RETURN_STATEMENT, BREAK_STATEMENT;
 
@@ -132,8 +134,6 @@ VARIABLE_TYPE ::= Integer | Float | String | Bool | Char ;
 
 BINARY_ARITHMETIC_OPERATOR ::= Sum | Subtraction | Multiplication | Division |  Module | Power;
 
-UNARY_ARITHMETIC_OPERATOR ::= Increment | Decrement;
-
 NEGATIVE_OPERATOR ::= Negative; 
 
 LITERALS ::= IntegerLiteral | FloatLiteral | BoolLiteral | CharacterLiteral | StringLiteral ;
@@ -167,14 +167,30 @@ PARAMETER_DECLARATION_OPTION ::=
                     PARAMETER_DECLARATION_LIST
                     ;
 
-SIMPLE_EXPRESSION ::= 
-                    LITERALS | 
+NEGATIVE_LITERAL ::= 
+                    NEGATIVE_OPERATOR IntegerLiteral | 
+                    NEGATIVE_OPERATOR FloatLiteral
+                    ;
+
+UNARY_ARITHMETIC_EXPRESSION ::= 
+                                Identifier Increment |
+                                Identifier Decrement 
+                                ;
+
+SIMPLE_EXPRESSION ::=                      
+                    Identifier |
+                    LITERALS |
                     FUNCTION_CALL 
                     ;
 
 ARITHMETIC_EXPRESSION ::= SIMPLE_EXPRESSION BINARY_ARITHMETIC_OPERATOR EXPRESSION;
 
-EXPRESSION ::= SIMPLE_EXPRESSION | ARITHMETIC_EXPRESSION;
+EXPRESSION ::= 
+            SIMPLE_EXPRESSION | 
+            ARITHMETIC_EXPRESSION |
+            NEGATIVE_LITERAL |
+            UNARY_ARITHMETIC_EXPRESSION
+            ;
 
 VARIABLE_DECLARATION ::= VARIABLE_TYPE Identifier EndSentence |
                          VARIABLE_TYPE Identifier AssignmentSign EXPRESSION EndSentence
