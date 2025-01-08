@@ -245,7 +245,7 @@ public class View_Main extends javax.swing.JFrame {
                        sb.append(String.format(formato, "Linea: " + numLine + " Columna: " + numColumn ,"<ParentesisApertura>" , symbol.value ));
                        break;
                     case sym.ParenthesisClosure:
-                       sb.append(String.format(formato, "Linea: " + numLine + " Columna: " + numColumn ,"<ParentesisApertura>" , symbol.value ));
+                       sb.append(String.format(formato, "Linea: " + numLine + " Columna: " + numColumn ,"<ParentesisCierre>" , symbol.value ));
                        break;
                     case sym.CharacterLiteral:
                        sb.append(String.format(formato, "Linea: " + numLine + " Columna: " + numColumn ,"<LiteralCaracter>" , symbol.value ));
