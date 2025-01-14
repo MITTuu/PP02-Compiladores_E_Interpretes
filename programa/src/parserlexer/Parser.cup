@@ -101,7 +101,8 @@ non terminal FUNCTION_DECLARATION_BODY, EXPRESSION, BINARY_ARITHMETIC_OPERATOR, 
 non terminal FUNCTION_BODY_ELEMENT, NEGATIVE_LITERAL, UNARY_ARITHMETIC_EXPRESSION;
 non terminal CONTROL_STRUCTURE, IF_STRUCTURE, WHILE_STRUCTURE, FOR_STRUCTURE, SWITCH_STRUCTURE,CASES, CASE, RETURN_STATEMENT, BREAK_STATEMENT;
 non terminal PRINT_STATEMENT, READ_STATEMENT, RELATIONAL_EXPRESSION, LOGICAL_EXPRESSION, EXPRESSION_LIST, FUNCTION_NAME, ARRAY_DECLARATION,ARRAY_USE;
-non terminal ARRAY_ELEMENTS, LITERAL_LIST, ELSE_STRUCTURE, ELSE_IF_STRUCTURE, IF_ELSE_STRUCTURE_TYPE;
+non terminal ARRAY_ELEMENTS, LITERAL_LIST, ELSE_STRUCTURE, ELSE_IF_STRUCTURE, IF_ELSE_STRUCTURE_TYPE, UPDATE_EXPRESSION, RELATIONAL_OPERATOR;
+non terminal FIND_ERROR_WITH_END_SENTENCE, FIND_ERROR_WITH_BLOCK_CLOSURE;
 
 /* ---------- Precedences ---------- */
 
@@ -120,7 +121,7 @@ start with PROGRAM;
 // Definición del non terminal inicial
 PROGRAM ::= /* Vacío */ 
           | PROGRAM FUNCTION_DECLARATION 
-          | PROGRAM error BlockClosure {:Symbol s = (Symbol)CUP$Parser$stack.peek(); parser.print("BlockClosure",s); :};
+          | PROGRAM FIND_ERROR_WITH_BLOCK_CLOSURE;
 
 FUNCTION_DECLARATION ::= VARIABLE_TYPE FUNCTION_NAME ParenthesisOpening PARAMETER_DECLARATION_OPTION ParenthesisClosure BlockOpening FUNCTION_DECLARATION_BODY BlockClosure;
 
@@ -139,9 +140,13 @@ FUNCTION_BODY_ELEMENT ::= VARIABLE_DECLARATION
                         | BREAK_STATEMENT 
                         ;
 
-PRINT_STATEMENT ::= Print ParenthesisOpening EXPRESSION ParenthesisClosure EndSentence;
+PRINT_STATEMENT ::= Print ParenthesisOpening EXPRESSION ParenthesisClosure EndSentence
+                  | PRINT_STATEMENT FIND_ERROR_WITH_END_SENTENCE
+                  ;
 
-READ_STATEMENT ::= Read ParenthesisOpening Identifier ParenthesisClosure EndSentence;
+READ_STATEMENT ::= Read ParenthesisOpening Identifier ParenthesisClosure EndSentence
+                 | READ_STATEMENT FIND_ERROR_WITH_END_SENTENCE
+                 ;
 
 VARIABLE_TYPE ::= Integer 
                 | Float 
@@ -178,8 +183,7 @@ FUNCTION_NAME ::= Identifier
                 | Main
                 ;
 
-FUNCTION_CALL_PARAMETER ::= Identifier 
-                          | LITERALS;
+FUNCTION_CALL_PARAMETER ::= SIMPLE_EXPRESSION;
 
 FUNCTION_CALL_PARAMETER_LIST ::= FUNCTION_CALL_PARAMETER 
                                | FUNCTION_CALL_PARAMETER Comma FUNCTION_CALL_PARAMETER_LIST;
@@ -187,7 +191,9 @@ FUNCTION_CALL_PARAMETER_LIST ::= FUNCTION_CALL_PARAMETER
 FUNCTION_CALL_PARAMETER_OPTION ::= /* Vacío */ 
                                  | FUNCTION_CALL_PARAMETER_LIST;
 
-FUNCTION_CALL ::= FUNCTION_NAME ParenthesisOpening FUNCTION_CALL_PARAMETER_OPTION  ParenthesisClosure EndSentence;
+FUNCTION_CALL ::= FUNCTION_NAME ParenthesisOpening FUNCTION_CALL_PARAMETER_OPTION  ParenthesisClosure EndSentence
+                | FUNCTION_CALL FIND_ERROR_WITH_END_SENTENCE
+                ;
 
 PARAMETER_DECLARATION::= VARIABLE_TYPE Identifier;
 
@@ -203,42 +209,51 @@ NEGATIVE_LITERAL ::= NEGATIVE_OPERATOR IntegerLiteral
 UNARY_ARITHMETIC_EXPRESSION ::= Identifier Increment 
                               | Identifier Decrement;
 
-SIMPLE_EXPRESSION ::= Identifier
-                    | ARRAY_USE 
-                    | LITERALS 
-                    | FUNCTION_CALL;
 
-ARITHMETIC_EXPRESSION ::= SIMPLE_EXPRESSION BINARY_ARITHMETIC_OPERATOR EXPRESSION;
+EXPRESSION ::= NEGATIVE_LITERAL 
+             | ARITHMETIC_EXPRESSION
+             | LOGICAL_EXPRESSION             
+             ;
 
-EXPRESSION ::= SIMPLE_EXPRESSION 
-             | ARITHMETIC_EXPRESSION 
-             | NEGATIVE_LITERAL 
-             | UNARY_ARITHMETIC_EXPRESSION
-             | RELATIONAL_EXPRESSION 
-             | ParenthesisOpening EXPRESSION ParenthesisClosure;
 
-RELATIONAL_EXPRESSION ::= SIMPLE_EXPRESSION Less SIMPLE_EXPRESSION 
-                        | SIMPLE_EXPRESSION LessEqual SIMPLE_EXPRESSION 
-                        | SIMPLE_EXPRESSION Greater SIMPLE_EXPRESSION 
-                        | SIMPLE_EXPRESSION GreaterEqual SIMPLE_EXPRESSION 
-                        | SIMPLE_EXPRESSION Equal SIMPLE_EXPRESSION 
-                        | SIMPLE_EXPRESSION NotEqual SIMPLE_EXPRESSION;
+SIMPLE_EXPRESSION ::= Identifier                     
+                    | LITERALS
+                    | ARRAY_USE
+                    | FUNCTION_CALL
+                    | UNARY_ARITHMETIC_EXPRESSION
+                    | ParenthesisOpening EXPRESSION ParenthesisClosure
+                    ;
 
-LOGICAL_EXPRESSION ::= Bool
-                     | RELATIONAL_EXPRESSION
-                     | Negation RELATIONAL_EXPRESSION
-                     | RELATIONAL_EXPRESSION Conjunction LOGICAL_EXPRESSION 
-                     | RELATIONAL_EXPRESSION Disjunction LOGICAL_EXPRESSION 
+ARITHMETIC_EXPRESSION ::= SIMPLE_EXPRESSION
+                        | ARITHMETIC_EXPRESSION BINARY_ARITHMETIC_OPERATOR ARITHMETIC_EXPRESSION
+                        ;
+
+RELATIONAL_OPERATOR ::= Less 
+                      | LessEqual 
+                      | Greater
+                      | GreaterEqual
+                      | Equal
+                      | NotEqual
+                      ;
+
+RELATIONAL_EXPRESSION ::= ARITHMETIC_EXPRESSION RELATIONAL_OPERATOR ARITHMETIC_EXPRESSION;
+
+LOGICAL_EXPRESSION ::= RELATIONAL_EXPRESSION
+                     | Negation LOGICAL_EXPRESSION
+                     | RELATIONAL_EXPRESSION Conjunction SIMPLE_EXPRESSION 
+                     | RELATIONAL_EXPRESSION Disjunction SIMPLE_EXPRESSION 
                      ;
 
 VARIABLE_DECLARATION ::= VARIABLE_TYPE Identifier EndSentence 
                        | VARIABLE_TYPE Identifier AssignmentSign EXPRESSION EndSentence 
                        | ARRAY_DECLARATION EndSentence 
                        | ARRAY_DECLARATION AssignmentSign ARRAY_ELEMENTS EndSentence
-                       | VARIABLE_DECLARATION error EndSentence {:Symbol s = (Symbol)CUP$Parser$stack.peek(); parser.print("EndSentence",s); :}
+                       | VARIABLE_DECLARATION FIND_ERROR_WITH_END_SENTENCE
                        ;
 
-ARRAY_ELEMENTS ::= BlockOpening LITERAL_LIST BlockClosure;
+ARRAY_ELEMENTS ::= BlockOpening LITERAL_LIST BlockClosure
+                 | ARRAY_ELEMENTS FIND_ERROR_WITH_BLOCK_CLOSURE
+                 ;
 
 LITERAL_LIST ::= LITERALS
                | LITERAL_LIST Comma LITERALS
@@ -248,13 +263,16 @@ EXPRESSION_LIST ::= EXPRESSION
                   | EXPRESSION Comma EXPRESSION_LIST;
 
 VARIABLE_ASSIGNMENT ::= Identifier AssignmentSign EXPRESSION EndSentence
-                      | Identifier AssignmentSign ARRAY_ELEMENTS EndSentence
+                      | Identifier AssignmentSign ARRAY_ELEMENTS EndSentence //Para asignación de arreglo de elementos
+                      | ARRAY_USE AssignmentSign EXPRESSION EndSentence //Para asignación de un elemento en el arreglo
+                      | VARIABLE_ASSIGNMENT FIND_ERROR_WITH_END_SENTENCE
                       ;
 
 CONTROL_STRUCTURE ::= IF_STRUCTURE 
                     | WHILE_STRUCTURE
                     | FOR_STRUCTURE
                     | SWITCH_STRUCTURE
+                    | CONTROL_STRUCTURE FIND_ERROR_WITH_BLOCK_CLOSURE
                     ;
 
 IF_STRUCTURE ::= If ParenthesisOpening LOGICAL_EXPRESSION ParenthesisClosure BlockOpening FUNCTION_DECLARATION_BODY BlockClosure ;
@@ -272,7 +290,11 @@ IF_ELSE_STRUCTURE_TYPE ::= IF_STRUCTURE
 
 WHILE_STRUCTURE ::= While ParenthesisOpening LOGICAL_EXPRESSION ParenthesisClosure BlockOpening FUNCTION_DECLARATION_BODY BlockClosure;
 
-FOR_STRUCTURE ::= For ParenthesisOpening VARIABLE_DECLARATION EndSentence LOGICAL_EXPRESSION EndSentence VARIABLE_ASSIGNMENT ParenthesisClosure BlockOpening FUNCTION_DECLARATION_BODY BlockClosure;
+FOR_STRUCTURE ::= For ParenthesisOpening VARIABLE_DECLARATION  LOGICAL_EXPRESSION EndSentence UPDATE_EXPRESSION ParenthesisClosure BlockOpening FUNCTION_DECLARATION_BODY BlockClosure;
+
+UPDATE_EXPRESSION ::= UNARY_ARITHMETIC_EXPRESSION
+                    | Identifier AssignmentSign EXPRESSION
+                    ;
 
 SWITCH_STRUCTURE ::= Switch ParenthesisOpening LOGICAL_EXPRESSION ParenthesisClosure BlockOpening CASES Default Colon FUNCTION_DECLARATION_BODY BlockClosure;
 
@@ -281,6 +303,14 @@ CASES ::= CASE
 
 CASE ::= Case LITERALS Colon FUNCTION_DECLARATION_BODY Break EndSentence;
 
-RETURN_STATEMENT ::= Return EXPRESSION EndSentence;
+RETURN_STATEMENT ::= Return EXPRESSION EndSentence
+                   | RETURN_STATEMENT FIND_ERROR_WITH_END_SENTENCE
+                   ;
 
-BREAK_STATEMENT ::= Break EndSentence;
+BREAK_STATEMENT ::= Break EndSentence
+                  | BREAK_STATEMENT FIND_ERROR_WITH_END_SENTENCE
+                  ;
+
+FIND_ERROR_WITH_END_SENTENCE ::= error EndSentence {:Symbol s = (Symbol)CUP$Parser$stack.peek(); parser.print("EndSentence",s); :};
+
+FIND_ERROR_WITH_BLOCK_CLOSURE ::= error BlockClosure {:Symbol s = (Symbol)CUP$Parser$stack.peek(); parser.print("BlockClosure",s); :};
