@@ -102,6 +102,7 @@ non terminal FUNCTION_BODY_ELEMENT, NEGATIVE_LITERAL, UNARY_ARITHMETIC_EXPRESSIO
 non terminal CONTROL_STRUCTURE, IF_STRUCTURE, WHILE_STRUCTURE, FOR_STRUCTURE, SWITCH_STRUCTURE,CASES, CASE, RETURN_STATEMENT, BREAK_STATEMENT;
 non terminal PRINT_STATEMENT, READ_STATEMENT, RELATIONAL_EXPRESSION, LOGICAL_EXPRESSION, EXPRESSION_LIST, FUNCTION_NAME, ARRAY_DECLARATION,ARRAY_USE;
 non terminal ARRAY_ELEMENTS, LITERAL_LIST, ELSE_STRUCTURE, ELSE_IF_STRUCTURE, IF_ELSE_STRUCTURE_TYPE, UPDATE_EXPRESSION, RELATIONAL_OPERATOR;
+non terminal INIT_FOR_STRUCTURE, SWITCH_EXPRESSION, CASE_LABEL, FUNCTION_CALL_EXPRESSION;
 non terminal FIND_ERROR_WITH_END_SENTENCE, FIND_ERROR_WITH_BLOCK_CLOSURE;
 
 /* ---------- Precedences ---------- */
@@ -132,7 +133,7 @@ FUNCTION_DECLARATION_BODY ::= FUNCTION_BODY_ELEMENT
 
 FUNCTION_BODY_ELEMENT ::= VARIABLE_DECLARATION 
                         | VARIABLE_ASSIGNMENT 
-                        | FUNCTION_CALL 
+                        | FUNCTION_CALL_EXPRESSION 
                         | CONTROL_STRUCTURE
                         | PRINT_STATEMENT 
                         | READ_STATEMENT
@@ -191,9 +192,11 @@ FUNCTION_CALL_PARAMETER_LIST ::= FUNCTION_CALL_PARAMETER
 FUNCTION_CALL_PARAMETER_OPTION ::= /* Vacío */ 
                                  | FUNCTION_CALL_PARAMETER_LIST;
 
-FUNCTION_CALL ::= FUNCTION_NAME ParenthesisOpening FUNCTION_CALL_PARAMETER_OPTION  ParenthesisClosure EndSentence
-                | FUNCTION_CALL FIND_ERROR_WITH_END_SENTENCE
-                ;
+FUNCTION_CALL ::= FUNCTION_NAME ParenthesisOpening FUNCTION_CALL_PARAMETER_OPTION  ParenthesisClosure;
+
+FUNCTION_CALL_EXPRESSION ::= FUNCTION_CALL EndSentence
+                           | FUNCTION_CALL_EXPRESSION FIND_ERROR_WITH_END_SENTENCE
+                           ;
 
 PARAMETER_DECLARATION::= VARIABLE_TYPE Identifier;
 
@@ -240,8 +243,10 @@ RELATIONAL_EXPRESSION ::= ARITHMETIC_EXPRESSION RELATIONAL_OPERATOR ARITHMETIC_E
 
 LOGICAL_EXPRESSION ::= RELATIONAL_EXPRESSION
                      | Negation LOGICAL_EXPRESSION
-                     | RELATIONAL_EXPRESSION Conjunction SIMPLE_EXPRESSION 
-                     | RELATIONAL_EXPRESSION Disjunction SIMPLE_EXPRESSION 
+                     | LOGICAL_EXPRESSION Conjunction RELATIONAL_EXPRESSION 
+                     | LOGICAL_EXPRESSION Disjunction RELATIONAL_EXPRESSION
+                     | LOGICAL_EXPRESSION Conjunction ARITHMETIC_EXPRESSION 
+                     | LOGICAL_EXPRESSION Disjunction ARITHMETIC_EXPRESSION
                      ;
 
 VARIABLE_DECLARATION ::= VARIABLE_TYPE Identifier EndSentence 
@@ -263,12 +268,13 @@ EXPRESSION_LIST ::= EXPRESSION
                   | EXPRESSION Comma EXPRESSION_LIST;
 
 VARIABLE_ASSIGNMENT ::= Identifier AssignmentSign EXPRESSION EndSentence
+                      | UNARY_ARITHMETIC_EXPRESSION EndSentence
                       | Identifier AssignmentSign ARRAY_ELEMENTS EndSentence //Para asignación de arreglo de elementos
                       | ARRAY_USE AssignmentSign EXPRESSION EndSentence //Para asignación de un elemento en el arreglo
                       | VARIABLE_ASSIGNMENT FIND_ERROR_WITH_END_SENTENCE
                       ;
 
-CONTROL_STRUCTURE ::= IF_STRUCTURE 
+CONTROL_STRUCTURE ::= IF_ELSE_STRUCTURE_TYPE 
                     | WHILE_STRUCTURE
                     | FOR_STRUCTURE
                     | SWITCH_STRUCTURE
@@ -290,20 +296,41 @@ IF_ELSE_STRUCTURE_TYPE ::= IF_STRUCTURE
 
 WHILE_STRUCTURE ::= While ParenthesisOpening LOGICAL_EXPRESSION ParenthesisClosure BlockOpening FUNCTION_DECLARATION_BODY BlockClosure;
 
-FOR_STRUCTURE ::= For ParenthesisOpening VARIABLE_DECLARATION  LOGICAL_EXPRESSION EndSentence UPDATE_EXPRESSION ParenthesisClosure BlockOpening FUNCTION_DECLARATION_BODY BlockClosure;
+FOR_STRUCTURE ::= For ParenthesisOpening INIT_FOR_STRUCTURE LOGICAL_EXPRESSION EndSentence UPDATE_EXPRESSION ParenthesisClosure BlockOpening FUNCTION_DECLARATION_BODY BlockClosure;
+
+INIT_FOR_STRUCTURE ::= VARIABLE_DECLARATION
+                     | VARIABLE_ASSIGNMENT
+                     ;
 
 UPDATE_EXPRESSION ::= UNARY_ARITHMETIC_EXPRESSION
                     | Identifier AssignmentSign EXPRESSION
                     ;
 
-SWITCH_STRUCTURE ::= Switch ParenthesisOpening LOGICAL_EXPRESSION ParenthesisClosure BlockOpening CASES Default Colon FUNCTION_DECLARATION_BODY BlockClosure;
+SWITCH_STRUCTURE ::= Switch ParenthesisOpening SWITCH_EXPRESSION ParenthesisClosure BlockOpening CASES  BlockClosure;
 
 CASES ::= CASE 
         | CASE CASES;
 
-CASE ::= Case LITERALS Colon FUNCTION_DECLARATION_BODY Break EndSentence;
+CASE ::= Case CASE_LABEL Colon FUNCTION_DECLARATION_BODY
+       | Default Colon FUNCTION_DECLARATION_BODY
+       ;
 
-RETURN_STATEMENT ::= Return EXPRESSION EndSentence
+SWITCH_EXPRESSION ::= Identifier                      
+                    | Integer 
+                    | Char 
+                    | ARRAY_USE
+                    | FUNCTION_CALL
+                    | UNARY_ARITHMETIC_EXPRESSION
+                    | ParenthesisOpening EXPRESSION ParenthesisClosure
+                    ;
+
+CASE_LABEL ::= Identifier                      
+             | IntegerLiteral 
+             | CharacterLiteral
+             ;
+
+RETURN_STATEMENT ::= Return EndSentence
+                   | Return EXPRESSION EndSentence
                    | RETURN_STATEMENT FIND_ERROR_WITH_END_SENTENCE
                    ;
 
