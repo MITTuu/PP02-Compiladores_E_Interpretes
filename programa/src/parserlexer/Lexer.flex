@@ -34,7 +34,7 @@ import java.util.List;
     
     // Agrega errores controlados a la lista
     public void logError(int column,int line,String text) {
-        Symbol symbol = new Symbol(sym.Error, column, line, text);
+        Symbol symbol = new Symbol(0, column, line, text);
         lexErrorList.add(symbol);
     }
 %}

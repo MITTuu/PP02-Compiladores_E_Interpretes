@@ -204,9 +204,7 @@ public class View_Main extends javax.swing.JFrame {
                 }
               
                 //Flag para registrar error solo una vez
-                if(continuaError && symbol.sym != sym.Error){
-                    continuaError = false;
-                }
+
                 switch (symbol.sym) {
                     case sym.BlockOpening:
                         sb.append(String.format(formato, "Linea: " + numLine + " Columna: " + numColumn , "<Apertura de Bloque>" , symbol.value ));
@@ -360,15 +358,7 @@ public class View_Main extends javax.swing.JFrame {
                        break;
                     case sym.Comma:
                        sb.append(String.format(formato, "Linea: " + numLine + " Columna: " + numColumn ,"<Coma>" , symbol.value ));
-                       break;                      
-                    case sym.Error:
-                        if(continuaError){
-                            break;
-                        }
-                        sb.append(String.format(formato, "Linea: " + numLine + " Columna: " + numColumn ,"<ERROR: Símbolo no definido>" , symbol.value ));
-                        //Flag para registrar error solo una vez
-                        continuaError = true;
-                        break;  
+                       break;                       
                     default:
                         sb.append(String.format(formato, "Linea: " + numLine + " Columna: " + numColumn , "Símbolo <no controlado>", symbol.value ));
                         break;  
