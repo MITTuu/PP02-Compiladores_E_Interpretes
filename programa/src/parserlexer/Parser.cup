@@ -131,7 +131,13 @@ start with PROGRAM;
 
 // Definición del non terminal inicial
 PROGRAM ::= /* Vacío */ 
-          | PROGRAM FUNCTION_DECLARATION {: RESULT = " -Texto Generico- "; :}
+
+          | PROGRAM FUNCTION_DECLARATION 
+          {: RESULT = " -Texto Generico- "; 
+            System.out.println("\nTablas de simbolos generadas");
+            symbolTable.printFunctionSymbols();
+            symbolTable.printVariableSymbols();
+          :}
           ;
 
 FUNCTION ::= VARIABLE_TYPE:type FUNCTION_NAME:name 
@@ -142,6 +148,7 @@ FUNCTION ::= VARIABLE_TYPE:type FUNCTION_NAME:name
                     {
                         symbolTable.addFunction(name.toString(), type.toString(), params.toString());                            
                         System.out.println("La funcion " + name.toString() + " ha sido agregada a la tabla de símbolos.");
+
                     }else {
                         parser.logError("La función '" + name.toString() + "' ya está definida.");
                     }
@@ -151,7 +158,6 @@ FUNCTION ::= VARIABLE_TYPE:type FUNCTION_NAME:name
 
 FUNCTION_DECLARATION ::= FUNCTION BlockOpening FUNCTION_DECLARATION_BODY:body BlockClosure 
                          {:                        
-                            symbolTable.printFunctionSymbols();
                             RESULT = " -Texto Generico- ";
                          :}
                         ;
@@ -266,7 +272,6 @@ ARRAY_DECLARATION ::= VARIABLE_TYPE:type Identifier:id BracketOpening BracketClo
                         }else {
                             parser.logError("La variable '" + id.toString() + "' ya está definida.");
                         }
-                        symbolTable.printVariableSymbols();
                     :};
 
 ARRAY_USE ::= Identifier BracketOpening Integer BracketClosure {: RESULT = " -Texto Generico- "; :}
