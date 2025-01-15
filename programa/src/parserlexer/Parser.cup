@@ -3,15 +3,20 @@ package parserlexer;
 import java_cup.runtime.Symbol;
 import java.util.ArrayList;
 import java.util.List;
+import utils.SymbolTable;
+
+action code 
+{: 
+    public SymbolTable symbolTable = new SymbolTable(); 
+:}
 
 parser code
 {:
     private Symbol s;
-    
+  
     //Lista de errores controlados
     private List<String> errorList = new ArrayList<>();
     
-
     // Agrega errores controlados a la lista
     public void logError(Symbol s) {
         String error = "Error cerca de Linea: " + (s.right + 1) + " Columna: " + (s.left + 1) + ", Texto: \"" + s.value + "\"";
@@ -124,12 +129,42 @@ PROGRAM ::= /* Vacío */
           | PROGRAM FUNCTION_DECLARATION 
           | PROGRAM FIND_ERROR_WITH_BLOCK_CLOSURE;
 
-FUNCTION_DECLARATION ::= VARIABLE_TYPE FUNCTION_NAME ParenthesisOpening PARAMETER_DECLARATION_OPTION ParenthesisClosure BlockOpening FUNCTION_DECLARATION_BODY BlockClosure;
+FUNCTION_DECLARATION ::= VARIABLE_TYPE:type FUNCTION_NAME:id 
+                         ParenthesisOpening PARAMETER_DECLARATION_OPTION:params ParenthesisClosure 
+                         BlockOpening FUNCTION_DECLARATION_BODY:body BlockClosure 
+                         {:
+                            symbolTable.addFunction(id.toString(), type.toString(), params.toString());
+                            System.out.println("La función " + id.toString() + " ha sido agregada a la tabla de símbolos.");
+                            symbolTable.printFunctionSymbols();
+                         :};
+
+VARIABLE_TYPE ::= Integer {: RESULT = "Integer"; :}
+                | Float   {: RESULT = "Float";   :}
+                | String  {: RESULT = "String";  :}
+                | Bool    {: RESULT = "Bool";    :}
+                | Char    {: RESULT = "Char";    :};
+
+FUNCTION_NAME ::= Identifier:id {: RESULT = id.toString(); :}
+                | Main          {: RESULT = "Main";        :};
+
+PARAMETER_DECLARATION ::= VARIABLE_TYPE:type Identifier:id 
+                          {: RESULT = type.toString() + " " + id.toString(); :};
+
+PARAMETER_DECLARATION_LIST ::= PARAMETER_DECLARATION:param 
+                               {: RESULT = param; :}
+                             | PARAMETER_DECLARATION:param Comma PARAMETER_DECLARATION_LIST:list 
+                               {: RESULT = param + ", " + list; :};
+
+PARAMETER_DECLARATION_OPTION ::= /* Vacío */ 
+                                 {: RESULT = ""; :}
+                               | PARAMETER_DECLARATION_LIST:params 
+                                 {: RESULT = params; :};
 
 
 FUNCTION_DECLARATION_BODY ::= FUNCTION_BODY_ELEMENT 
-                            | FUNCTION_DECLARATION_BODY FUNCTION_BODY_ELEMENT 
-                            ;
+                              {: RESULT = "Cuerpo de la funcion simple"; :} 
+                            | FUNCTION_DECLARATION_BODY FUNCTION_BODY_ELEMENT
+                              {: RESULT = "Cuerpo de la funcion compuesto"; :};
 
 FUNCTION_BODY_ELEMENT ::= VARIABLE_DECLARATION 
                         | VARIABLE_ASSIGNMENT 
@@ -148,13 +183,6 @@ PRINT_STATEMENT ::= Print ParenthesisOpening EXPRESSION ParenthesisClosure EndSe
 READ_STATEMENT ::= Read ParenthesisOpening Identifier ParenthesisClosure EndSentence
                  | READ_STATEMENT FIND_ERROR_WITH_END_SENTENCE
                  ;
-
-VARIABLE_TYPE ::= Integer 
-                | Float 
-                | String 
-                | Bool 
-                | Char
-                ;
 
 ARRAY_DECLARATION ::= VARIABLE_TYPE Identifier BracketOpening  BracketClosure 
                     | VARIABLE_TYPE Identifier BracketOpening Integer BracketClosure 
@@ -180,10 +208,6 @@ LITERALS ::= IntegerLiteral
            | CharacterLiteral 
            | StringLiteral;
 
-FUNCTION_NAME ::= Identifier
-                | Main
-                ;
-
 FUNCTION_CALL_PARAMETER ::= SIMPLE_EXPRESSION;
 
 FUNCTION_CALL_PARAMETER_LIST ::= FUNCTION_CALL_PARAMETER 
@@ -197,14 +221,6 @@ FUNCTION_CALL ::= FUNCTION_NAME ParenthesisOpening FUNCTION_CALL_PARAMETER_OPTIO
 FUNCTION_CALL_EXPRESSION ::= FUNCTION_CALL EndSentence
                            | FUNCTION_CALL_EXPRESSION FIND_ERROR_WITH_END_SENTENCE
                            ;
-
-PARAMETER_DECLARATION::= VARIABLE_TYPE Identifier;
-
-PARAMETER_DECLARATION_LIST ::= PARAMETER_DECLARATION 
-                             | PARAMETER_DECLARATION Comma PARAMETER_DECLARATION_LIST;
-
-PARAMETER_DECLARATION_OPTION ::= /* Vacío */ 
-                               | PARAMETER_DECLARATION_LIST;
 
 NEGATIVE_LITERAL ::= NEGATIVE_OPERATOR IntegerLiteral 
                    | NEGATIVE_OPERATOR FloatLiteral;
@@ -249,7 +265,11 @@ LOGICAL_EXPRESSION ::= RELATIONAL_EXPRESSION
                      | LOGICAL_EXPRESSION Disjunction ARITHMETIC_EXPRESSION
                      ;
 
-VARIABLE_DECLARATION ::= VARIABLE_TYPE Identifier EndSentence 
+VARIABLE_DECLARATION ::= VARIABLE_TYPE:type Identifier:id EndSentence
+                        {: 
+                            symbolTable.addVariable(id.toString(), type.toString(), "local");
+                            System.out.println("Variable " + id.toString() + " de tipo " + type.toString() + " ha sido declarada.");
+                        :}
                        | VARIABLE_TYPE Identifier AssignmentSign EXPRESSION EndSentence 
                        | ARRAY_DECLARATION EndSentence 
                        | ARRAY_DECLARATION AssignmentSign ARRAY_ELEMENTS EndSentence

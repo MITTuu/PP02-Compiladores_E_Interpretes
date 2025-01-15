@@ -1,6 +1,5 @@
 package views;
 
-import bin.sym;
 import bin.Lexer;
 import bin.Parser;
 import bin.sym;
