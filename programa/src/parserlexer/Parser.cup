@@ -108,7 +108,6 @@ non terminal CONTROL_STRUCTURE, IF_STRUCTURE, WHILE_STRUCTURE, FOR_STRUCTURE, SW
 non terminal PRINT_STATEMENT, READ_STATEMENT, RELATIONAL_EXPRESSION, LOGICAL_EXPRESSION, EXPRESSION_LIST, FUNCTION_NAME, ARRAY_DECLARATION,ARRAY_USE;
 non terminal ARRAY_ELEMENTS, LITERAL_LIST, ELSE_STRUCTURE, ELSE_IF_STRUCTURE, IF_ELSE_STRUCTURE_TYPE, UPDATE_EXPRESSION, RELATIONAL_OPERATOR;
 non terminal INIT_FOR_STRUCTURE, SWITCH_EXPRESSION, CASE_LABEL, FUNCTION_CALL_EXPRESSION;
-non terminal FIND_ERROR_WITH_END_SENTENCE, FIND_ERROR_WITH_BLOCK_CLOSURE;
 
 /* ---------- Precedences ---------- */
 
@@ -127,7 +126,7 @@ start with PROGRAM;
 // Definición del non terminal inicial
 PROGRAM ::= /* Vacío */ 
           | PROGRAM FUNCTION_DECLARATION 
-          | PROGRAM FIND_ERROR_WITH_BLOCK_CLOSURE;
+          ;
 
 FUNCTION_DECLARATION ::= VARIABLE_TYPE:type FUNCTION_NAME:id 
                          ParenthesisOpening PARAMETER_DECLARATION_OPTION:params ParenthesisClosure 
@@ -136,35 +135,42 @@ FUNCTION_DECLARATION ::= VARIABLE_TYPE:type FUNCTION_NAME:id
                             symbolTable.addFunction(id.toString(), type.toString(), params.toString());
                             System.out.println("La función " + id.toString() + " ha sido agregada a la tabla de símbolos.");
                             symbolTable.printFunctionSymbols();
-                         :};
+                         :}
+                        ;
 
 VARIABLE_TYPE ::= Integer {: RESULT = "Integer"; :}
                 | Float   {: RESULT = "Float";   :}
                 | String  {: RESULT = "String";  :}
                 | Bool    {: RESULT = "Bool";    :}
-                | Char    {: RESULT = "Char";    :};
+                | Char    {: RESULT = "Char";    :}
+                ;
 
 FUNCTION_NAME ::= Identifier:id {: RESULT = id.toString(); :}
-                | Main          {: RESULT = "Main";        :};
+                | Main          {: RESULT = "Main";        :}
+                ;
 
 PARAMETER_DECLARATION ::= VARIABLE_TYPE:type Identifier:id 
-                          {: RESULT = type.toString() + " " + id.toString(); :};
+                          {: RESULT = type.toString() + " " + id.toString(); :}
+                        ;
 
 PARAMETER_DECLARATION_LIST ::= PARAMETER_DECLARATION:param 
                                {: RESULT = param; :}
                              | PARAMETER_DECLARATION:param Comma PARAMETER_DECLARATION_LIST:list 
-                               {: RESULT = param + ", " + list; :};
+                               {: RESULT = param + ", " + list; :}
+                             ;
 
 PARAMETER_DECLARATION_OPTION ::= /* Vacío */ 
                                  {: RESULT = ""; :}
                                | PARAMETER_DECLARATION_LIST:params 
-                                 {: RESULT = params; :};
+                                 {: RESULT = params; :}
+                               ;
 
 
 FUNCTION_DECLARATION_BODY ::= FUNCTION_BODY_ELEMENT 
                               {: RESULT = "Cuerpo de la funcion simple"; :} 
                             | FUNCTION_DECLARATION_BODY FUNCTION_BODY_ELEMENT
-                              {: RESULT = "Cuerpo de la funcion compuesto"; :};
+                              {: RESULT = "Cuerpo de la funcion compuesto"; :}
+                            ;
 
 FUNCTION_BODY_ELEMENT ::= VARIABLE_DECLARATION 
                         | VARIABLE_ASSIGNMENT 
@@ -174,6 +180,7 @@ FUNCTION_BODY_ELEMENT ::= VARIABLE_DECLARATION
                         | READ_STATEMENT
                         | RETURN_STATEMENT
                         | BREAK_STATEMENT
+                        | error
                         ;
 
 VARIABLE_DECLARATION ::= VARIABLE_TYPE:type Identifier:id EndSentence
@@ -188,17 +195,13 @@ VARIABLE_DECLARATION ::= VARIABLE_TYPE:type Identifier:id EndSentence
                         :}
                        | ARRAY_DECLARATION EndSentence 
                        | ARRAY_DECLARATION AssignmentSign ARRAY_ELEMENTS EndSentence
-                       | VARIABLE_DECLARATION FIND_ERROR_WITH_END_SENTENCE
                        ;
 
 ARRAY_ELEMENTS ::= BlockOpening LITERAL_LIST:list BlockClosure
-                 {: 
-                     System.out.println("Elementos del array: " + list.toString());
-                 :}
-                 | ARRAY_ELEMENTS FIND_ERROR_WITH_BLOCK_CLOSURE
-                 {: 
-                     System.out.println("Error en los elementos del array.");
-                 :};
+                    {: 
+                        System.out.println("Elementos del array: " + list.toString());
+                    :}
+                 ;
 
 ARRAY_DECLARATION ::= VARIABLE_TYPE:type Identifier:id BracketOpening BracketClosure 
                     {: 
@@ -225,18 +228,17 @@ LITERAL_LIST ::= LITERALS
                | LITERAL_LIST Comma LITERALS
                ;
 
-LITERALS ::= IntegerLiteral 
-           | FloatLiteral 
-           | BoolLiteral 
-           | CharacterLiteral 
-           | StringLiteral;
+LITERALS ::= IntegerLiteral
+           | FloatLiteral
+           | BoolLiteral
+           | CharacterLiteral
+           | StringLiteral
+           ;
 
 PRINT_STATEMENT ::= Print ParenthesisOpening EXPRESSION ParenthesisClosure EndSentence
-                  | PRINT_STATEMENT FIND_ERROR_WITH_END_SENTENCE
                   ;
 
 READ_STATEMENT ::= Read ParenthesisOpening Identifier ParenthesisClosure EndSentence
-                 | READ_STATEMENT FIND_ERROR_WITH_END_SENTENCE
                  ;
 
 BINARY_ARITHMETIC_OPERATOR ::= Sum 
@@ -244,23 +246,24 @@ BINARY_ARITHMETIC_OPERATOR ::= Sum
                              | Multiplication 
                              | Division 
                              | Module 
-                             | Power;
+                             | Power
+                             ;
 
 NEGATIVE_OPERATOR ::= Negative; 
 
 FUNCTION_CALL_PARAMETER ::= SIMPLE_EXPRESSION;
 
 FUNCTION_CALL_PARAMETER_LIST ::= FUNCTION_CALL_PARAMETER 
-                               | FUNCTION_CALL_PARAMETER Comma FUNCTION_CALL_PARAMETER_LIST;
+                               | FUNCTION_CALL_PARAMETER Comma FUNCTION_CALL_PARAMETER_LIST
+                               ;
 
 FUNCTION_CALL_PARAMETER_OPTION ::= /* Vacío */ 
-                                 | FUNCTION_CALL_PARAMETER_LIST;
+                                 | FUNCTION_CALL_PARAMETER_LIST
+                                 ;
 
 FUNCTION_CALL ::= FUNCTION_NAME ParenthesisOpening FUNCTION_CALL_PARAMETER_OPTION  ParenthesisClosure;
 
-FUNCTION_CALL_EXPRESSION ::= FUNCTION_CALL EndSentence
-                           | FUNCTION_CALL_EXPRESSION FIND_ERROR_WITH_END_SENTENCE
-                           ;
+FUNCTION_CALL_EXPRESSION ::= FUNCTION_CALL EndSentence;
 
 NEGATIVE_LITERAL ::= NEGATIVE_OPERATOR IntegerLiteral 
                    | NEGATIVE_OPERATOR FloatLiteral;
@@ -312,14 +315,12 @@ VARIABLE_ASSIGNMENT ::= Identifier AssignmentSign EXPRESSION EndSentence
                       | UNARY_ARITHMETIC_EXPRESSION EndSentence
                       | Identifier AssignmentSign ARRAY_ELEMENTS EndSentence //Para asignación de arreglo de elementos
                       | ARRAY_USE AssignmentSign EXPRESSION EndSentence //Para asignación de un elemento en el arreglo
-                      | VARIABLE_ASSIGNMENT FIND_ERROR_WITH_END_SENTENCE
                       ;
 
 CONTROL_STRUCTURE ::= IF_ELSE_STRUCTURE_TYPE 
                     | WHILE_STRUCTURE
                     | FOR_STRUCTURE
                     | SWITCH_STRUCTURE
-                    | CONTROL_STRUCTURE FIND_ERROR_WITH_BLOCK_CLOSURE
                     ;
 
 IF_STRUCTURE ::= If ParenthesisOpening LOGICAL_EXPRESSION ParenthesisClosure BlockOpening FUNCTION_DECLARATION_BODY BlockClosure ;
@@ -372,11 +373,7 @@ CASE_LABEL ::= Identifier
 
 RETURN_STATEMENT ::= Return EndSentence
                    | Return EXPRESSION EndSentence
-                   | RETURN_STATEMENT FIND_ERROR_WITH_END_SENTENCE
                    ;
 
 BREAK_STATEMENT ::= Break EndSentence
-                  | BREAK_STATEMENT FIND_ERROR_WITH_END_SENTENCE
                   ;
-FIND_ERROR_WITH_END_SENTENCE ::= error EndSentence {:Symbol s = (Symbol)CUP$Parser$stack.peek(); parser.print("EndSentence",s); :};
-FIND_ERROR_WITH_BLOCK_CLOSURE ::= error BlockClosure {:Symbol s = (Symbol)CUP$Parser$stack.peek(); parser.print("BlockClosure",s); :};
