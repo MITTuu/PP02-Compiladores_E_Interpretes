@@ -1,6 +1,8 @@
 package utils;
 
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 public class SymbolTable {
@@ -46,12 +48,25 @@ public class SymbolTable {
 
     // Imprime todas las variables en la tabla de símbolos con formato de tabla
     public void printVariableSymbols() {
+        // Agrupar las variables por scope
+        Map<String, List<VariableSymbol>> groupedByScope = new HashMap<>();
+
+        for (VariableSymbol symbol : variableSymbols.values()) {
+            groupedByScope.computeIfAbsent(symbol.getScope(), k -> new ArrayList<>()).add(symbol);
+        }
+
+        // Imprimir encabezado de la tabla
         System.out.println("\n" + String.format("%-20s %-15s %-10s", "Variable", "Tipo", "Alcance"));
         System.out.println("---------------------------------------------------------------");
-        for (VariableSymbol symbol : variableSymbols.values()) {
-            System.out.println(String.format("%-20s %-15s %-10s", symbol.getName(), symbol.getType(), symbol.getScope()));
+
+        // Imprimir variables agrupadas por scope
+        for (Map.Entry<String, List<VariableSymbol>> entry : groupedByScope.entrySet()) {
+            for (VariableSymbol symbol : entry.getValue()) {
+                System.out.println(String.format("%-20s %-15s %-10s", symbol.getName(), symbol.getType(), symbol.getScope()));
+            }
         }
     }
+
     
     // Clase para representar la información de una variable
     public class VariableSymbol {
