@@ -26,6 +26,14 @@ public class SymbolTable {
         }
         variableSymbols.put(name, new VariableSymbol(name, type, scope));
     }
+    
+    public boolean containsVariableKey (String name){
+     return variableSymbols.containsKey(name);
+    }
+    
+    public boolean containsFunctionKey (String name){
+     return variableSymbols.containsKey(name);
+    }
 
     // Imprime todas las funciones en la tabla de símbolos con formato de tabla
     public void printFunctionSymbols() {

@@ -6,20 +6,26 @@ import java.util.List;
 import utils.SymbolTable;
 
 action code 
-{: 
+{:     
+    String currentHash;
     public SymbolTable symbolTable = new SymbolTable(); 
 :}
 
 parser code
-{:
+{:    
     private Symbol s;
   
     //Lista de errores controlados
-    private List<String> errorList = new ArrayList<>();
+    public List<String> errorList = new ArrayList<>();
     
     // Agrega errores controlados a la lista
     public void logError(Symbol s) {
         String error = "Error cerca de Linea: " + (s.right + 1) + " Columna: " + (s.left + 1) + ", Texto: \"" + s.value + "\"";
+        errorList.add(error);
+    }
+
+    // Agrega errores controlados a la lista
+    public void logError(String error) {
         errorList.add(error);
     }
 
@@ -99,7 +105,7 @@ terminal                        Print, Read;
 
 /* ---------- NON TERMINALES ---------- */
 
-non terminal PROGRAM, VARIABLE_TYPE, VARIABLE_DECLARATION, VARIABLE_ASSIGNMENT;
+non terminal PROGRAM, FUNCTION, VARIABLE_TYPE, VARIABLE_DECLARATION, VARIABLE_ASSIGNMENT;
 non terminal NEGATIVE_OPERATOR, PARAMETER_DECLARATION, PARAMETER_DECLARATION_LIST, PARAMETER_DECLARATION_OPTION; 
 non terminal FUNCTION_DECLARATION,FUNCTION_CALL, FUNCTION_CALL_PARAMETER, FUNCTION_CALL_PARAMETER_LIST, FUNCTION_CALL_PARAMETER_OPTION, LITERALS ;
 non terminal FUNCTION_DECLARATION_BODY, EXPRESSION, BINARY_ARITHMETIC_OPERATOR, ARITHMETIC_EXPRESSION, SIMPLE_EXPRESSION;
@@ -128,14 +134,25 @@ PROGRAM ::= /* Vacío */
           | PROGRAM FUNCTION_DECLARATION {: RESULT = " -Texto Generico- "; :}
           ;
 
-FUNCTION_DECLARATION ::= VARIABLE_TYPE:type FUNCTION_NAME:id 
-                         ParenthesisOpening PARAMETER_DECLARATION_OPTION:params ParenthesisClosure 
-                         BlockOpening FUNCTION_DECLARATION_BODY:body BlockClosure 
-                         {:
-                            RESULT = " -Texto Generico- ";
-                            symbolTable.addFunction(id.toString(), type.toString(), params.toString());
-                            System.out.println("La función " + id.toString() + " ha sido agregada a la tabla de símbolos.");
+FUNCTION ::= VARIABLE_TYPE:type FUNCTION_NAME:name 
+             ParenthesisOpening PARAMETER_DECLARATION_OPTION:params ParenthesisClosure 
+                {:
+                    currentHash = name.toString();
+                    if(!symbolTable.containsFunctionKey(currentHash))
+                    {
+                        symbolTable.addFunction(name.toString(), type.toString(), params.toString());                            
+                        System.out.println("La funcion " + name.toString() + " ha sido agregada a la tabla de símbolos.");
+                    }else {
+                        parser.logError("La función '" + name.toString() + "' ya está definida.");
+                    }
+                    RESULT = " -Texto Generico- ";
+                :}
+           ;
+
+FUNCTION_DECLARATION ::= FUNCTION BlockOpening FUNCTION_DECLARATION_BODY:body BlockClosure 
+                         {:                        
                             symbolTable.printFunctionSymbols();
+                            RESULT = " -Texto Generico- ";
                          :}
                         ;
 
@@ -187,14 +204,24 @@ FUNCTION_BODY_ELEMENT ::= VARIABLE_DECLARATION {: RESULT = " -Texto Generico- ";
 VARIABLE_DECLARATION ::= VARIABLE_TYPE:type Identifier:id EndSentence
                         {: 
                             RESULT = " -Texto Generico- ";
-                            symbolTable.addVariable(id.toString(), type.toString(), "local");
-                            System.out.println("Variable " + id.toString() + " de tipo " + type.toString() + " ha sido declarada.");
+                            if(!symbolTable.containsVariableKey(id.toString()))
+                            {
+                                symbolTable.addVariable(id.toString(), type.toString(), currentHash);
+                                System.out.println("(Alcance: " + currentHash + ") Variable " + id.toString() + " de tipo " + type.toString() + " ha sido declarada.");
+                            }else {
+                                parser.logError("La variable '" + id.toString() + "' ya está definida.");
+                            }                            
                         :}
                        | VARIABLE_TYPE:type Identifier:id AssignmentSign EXPRESSION EndSentence
                         {: 
-                            RESULT = " -Texto Generico- ";
-                            symbolTable.addVariable(id.toString(), type.toString(), "local");
-                            System.out.println("Variable " + id.toString() + " de tipo " + type.toString() + " ha sido declarada.");
+                            RESULT = " -Texto Generico- ";                            
+                            if(!symbolTable.containsVariableKey(id.toString()))
+                            {
+                                symbolTable.addVariable(id.toString(), type.toString(), currentHash);
+                                System.out.println("(Alcance: " + currentHash + ") Variable " + id.toString() + " de tipo " + type.toString() + " ha sido declarada.");
+                            }else {
+                                parser.logError("La variable '" + id.toString() + "' ya está definida.");
+                            }
                         :}
                        | ARRAY_DECLARATION EndSentence {: RESULT = " -Texto Generico- "; :}
                        | ARRAY_DECLARATION AssignmentSign ARRAY_ELEMENTS EndSentence {: RESULT = " -Texto Generico- "; :}
@@ -209,21 +236,36 @@ ARRAY_ELEMENTS ::= BlockOpening LITERAL_LIST:list BlockClosure
 
 ARRAY_DECLARATION ::= VARIABLE_TYPE:type Identifier:id BracketOpening BracketClosure 
                     {: 
-                        RESULT = " -Texto Generico- "; 
-                        symbolTable.addVariable(id.toString(), type.toString() + "[]", "local");
-                        System.out.println("Array " + id.toString() + " de tipo " + type.toString() + " declarado.");
+                        RESULT = " -Texto Generico- ";                         
+                        if(!symbolTable.containsVariableKey(id.toString()))
+                        {
+                            symbolTable.addVariable(id.toString(), type.toString() + "[]", currentHash);
+                            System.out.println("(Alcance: " + currentHash + ") Array " + id.toString() + " de tipo " + type.toString() + " declarado.");
+                        }else {
+                            parser.logError("La variable '" + id.toString() + "' ya está definida.");
+                        }
                     :}
                     | VARIABLE_TYPE:type Identifier:id BracketOpening Integer:size BracketClosure 
                     {: 
-                        RESULT = " -Texto Generico- ";
-                        symbolTable.addVariable(id.toString(), type.toString() + "[" + size + "]", "local");
-                        System.out.println("Array " + id.toString() + " con tamaño " + size + " declarado.");
+                        RESULT = " -Texto Generico- ";                        
+                        if(!symbolTable.containsVariableKey(id.toString()))
+                        {
+                           symbolTable.addVariable(id.toString(), type.toString() + "[" + size + "]", currentHash);
+                           System.out.println("(Alcance: " + currentHash + ") Array " + id.toString() + " con tamaño " + size + " declarado.");
+                        }else {
+                            parser.logError("La variable '" + id.toString() + "' ya está definida.");
+                        }
                     :}
                     | VARIABLE_TYPE:type Identifier:id BracketOpening Identifier:sizeId BracketClosure 
                     {: 
-                        RESULT = " -Texto Generico- ";
-                        symbolTable.addVariable(id.toString(), type.toString() + "[]", "local");
-                        System.out.println("Array " + id.toString() + " de tamaño variable " + sizeId + " declarado.");
+                        RESULT = " -Texto Generico- ";                        
+                        if(!symbolTable.containsVariableKey(id.toString()))
+                        {
+                           symbolTable.addVariable(id.toString(), type.toString() + "[]", currentHash);
+                           System.out.println("(Alcance: " + currentHash + ") Array " + id.toString() + " de tamaño variable " + sizeId + " declarado.");
+                        }else {
+                            parser.logError("La variable '" + id.toString() + "' ya está definida.");
+                        }
                         symbolTable.printVariableSymbols();
                     :};
 
@@ -235,11 +277,11 @@ LITERAL_LIST ::= LITERALS {: RESULT = " -Texto Generico- "; :}
                | LITERAL_LIST Comma LITERALS {: RESULT = " -Texto Generico- "; :}
                ;
 
-LITERALS ::= IntegerLiteral {: RESULT = " -Texto Generico- "; :}
-           | FloatLiteral {: RESULT = " -Texto Generico- "; :}
-           | BoolLiteral {: RESULT = " -Texto Generico- "; :}
-           | CharacterLiteral {: RESULT = " -Texto Generico- "; :}
-           | StringLiteral {: RESULT = " -Texto Generico- "; :}
+LITERALS ::= IntegerLiteral: i {: RESULT = i; :}
+           | FloatLiteral: f {: RESULT = f; :}
+           | BoolLiteral: b {: RESULT = b; :}
+           | CharacterLiteral: c {: RESULT = "\'"+c+"\'"; :}
+           | StringLiteral: s {: RESULT = "\""+s+"\""; :}
            ;
 
 PRINT_STATEMENT ::= Print ParenthesisOpening EXPRESSION ParenthesisClosure EndSentence {: RESULT = " -Texto Generico- "; :}
