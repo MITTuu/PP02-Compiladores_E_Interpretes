@@ -125,13 +125,14 @@ start with PROGRAM;
 
 // Definición del non terminal inicial
 PROGRAM ::= /* Vacío */ 
-          | PROGRAM FUNCTION_DECLARATION 
+          | PROGRAM FUNCTION_DECLARATION {: RESULT = " -Texto Generico- "; :}
           ;
 
 FUNCTION_DECLARATION ::= VARIABLE_TYPE:type FUNCTION_NAME:id 
                          ParenthesisOpening PARAMETER_DECLARATION_OPTION:params ParenthesisClosure 
                          BlockOpening FUNCTION_DECLARATION_BODY:body BlockClosure 
                          {:
+                            RESULT = " -Texto Generico- ";
                             symbolTable.addFunction(id.toString(), type.toString(), params.toString());
                             System.out.println("La función " + id.toString() + " ha sido agregada a la tabla de símbolos.");
                             symbolTable.printFunctionSymbols();
@@ -172,208 +173,230 @@ FUNCTION_DECLARATION_BODY ::= FUNCTION_BODY_ELEMENT
                               {: RESULT = "Cuerpo de la funcion compuesto"; :}
                             ;
 
-FUNCTION_BODY_ELEMENT ::= VARIABLE_DECLARATION 
-                        | VARIABLE_ASSIGNMENT 
-                        | FUNCTION_CALL_EXPRESSION 
-                        | CONTROL_STRUCTURE
-                        | PRINT_STATEMENT 
-                        | READ_STATEMENT
-                        | RETURN_STATEMENT
-                        | BREAK_STATEMENT
-                        | error
+FUNCTION_BODY_ELEMENT ::= VARIABLE_DECLARATION {: RESULT = " -Texto Generico- "; :}
+                        | VARIABLE_ASSIGNMENT {: RESULT = " -Texto Generico- "; :}
+                        | FUNCTION_CALL_EXPRESSION {: RESULT = " -Texto Generico- "; :}
+                        | CONTROL_STRUCTURE {: RESULT = " -Texto Generico- "; :}
+                        | PRINT_STATEMENT {: RESULT = " -Texto Generico- "; :}
+                        | READ_STATEMENT {: RESULT = " -Texto Generico- "; :}
+                        | RETURN_STATEMENT {: RESULT = " -Texto Generico- "; :}
+                        | BREAK_STATEMENT {: RESULT = " -Texto Generico- "; :}
+                        | error {: RESULT = " -Texto Generico de Error- "; :}
                         ;
 
 VARIABLE_DECLARATION ::= VARIABLE_TYPE:type Identifier:id EndSentence
                         {: 
+                            RESULT = " -Texto Generico- ";
                             symbolTable.addVariable(id.toString(), type.toString(), "local");
                             System.out.println("Variable " + id.toString() + " de tipo " + type.toString() + " ha sido declarada.");
                         :}
                        | VARIABLE_TYPE:type Identifier:id AssignmentSign EXPRESSION EndSentence
                         {: 
+                            RESULT = " -Texto Generico- ";
                             symbolTable.addVariable(id.toString(), type.toString(), "local");
                             System.out.println("Variable " + id.toString() + " de tipo " + type.toString() + " ha sido declarada.");
                         :}
-                       | ARRAY_DECLARATION EndSentence 
-                       | ARRAY_DECLARATION AssignmentSign ARRAY_ELEMENTS EndSentence
+                       | ARRAY_DECLARATION EndSentence {: RESULT = " -Texto Generico- "; :}
+                       | ARRAY_DECLARATION AssignmentSign ARRAY_ELEMENTS EndSentence {: RESULT = " -Texto Generico- "; :}
                        ;
 
 ARRAY_ELEMENTS ::= BlockOpening LITERAL_LIST:list BlockClosure
                     {: 
+                        RESULT = " -Texto Generico- "; 
                         System.out.println("Elementos del array: " + list.toString());
                     :}
                  ;
 
 ARRAY_DECLARATION ::= VARIABLE_TYPE:type Identifier:id BracketOpening BracketClosure 
                     {: 
+                        RESULT = " -Texto Generico- "; 
                         symbolTable.addVariable(id.toString(), type.toString() + "[]", "local");
                         System.out.println("Array " + id.toString() + " de tipo " + type.toString() + " declarado.");
                     :}
                     | VARIABLE_TYPE:type Identifier:id BracketOpening Integer:size BracketClosure 
                     {: 
+                        RESULT = " -Texto Generico- ";
                         symbolTable.addVariable(id.toString(), type.toString() + "[" + size + "]", "local");
                         System.out.println("Array " + id.toString() + " con tamaño " + size + " declarado.");
                     :}
                     | VARIABLE_TYPE:type Identifier:id BracketOpening Identifier:sizeId BracketClosure 
                     {: 
+                        RESULT = " -Texto Generico- ";
                         symbolTable.addVariable(id.toString(), type.toString() + "[]", "local");
                         System.out.println("Array " + id.toString() + " de tamaño variable " + sizeId + " declarado.");
                         symbolTable.printVariableSymbols();
                     :};
 
-ARRAY_USE ::= Identifier BracketOpening Integer BracketClosure 
-            | Identifier BracketOpening Identifier BracketClosure
+ARRAY_USE ::= Identifier BracketOpening Integer BracketClosure {: RESULT = " -Texto Generico- "; :}
+            | Identifier BracketOpening Identifier BracketClosure {: RESULT = " -Texto Generico- "; :}
             ;
 
-LITERAL_LIST ::= LITERALS
-               | LITERAL_LIST Comma LITERALS
+LITERAL_LIST ::= LITERALS {: RESULT = " -Texto Generico- "; :}
+               | LITERAL_LIST Comma LITERALS {: RESULT = " -Texto Generico- "; :}
                ;
 
-LITERALS ::= IntegerLiteral
-           | FloatLiteral
-           | BoolLiteral
-           | CharacterLiteral
-           | StringLiteral
+LITERALS ::= IntegerLiteral {: RESULT = " -Texto Generico- "; :}
+           | FloatLiteral {: RESULT = " -Texto Generico- "; :}
+           | BoolLiteral {: RESULT = " -Texto Generico- "; :}
+           | CharacterLiteral {: RESULT = " -Texto Generico- "; :}
+           | StringLiteral {: RESULT = " -Texto Generico- "; :}
            ;
 
-PRINT_STATEMENT ::= Print ParenthesisOpening EXPRESSION ParenthesisClosure EndSentence
+PRINT_STATEMENT ::= Print ParenthesisOpening EXPRESSION ParenthesisClosure EndSentence {: RESULT = " -Texto Generico- "; :}
                   ;
 
-READ_STATEMENT ::= Read ParenthesisOpening Identifier ParenthesisClosure EndSentence
+READ_STATEMENT ::= Read ParenthesisOpening Identifier ParenthesisClosure EndSentence {: RESULT = " -Texto Generico- "; :}
                  ;
 
-BINARY_ARITHMETIC_OPERATOR ::= Sum 
-                             | Subtraction 
-                             | Multiplication 
-                             | Division 
-                             | Module 
-                             | Power
+BINARY_ARITHMETIC_OPERATOR ::= Sum {: RESULT = " -Texto Generico- "; :}
+                             | Subtraction {: RESULT = " -Texto Generico- "; :}
+                             | Multiplication {: RESULT = " -Texto Generico- "; :}
+                             | Division {: RESULT = " -Texto Generico- "; :}
+                             | Module {: RESULT = " -Texto Generico- "; :}
+                             | Power {: RESULT = " -Texto Generico- "; :}
                              ;
 
-NEGATIVE_OPERATOR ::= Negative; 
+NEGATIVE_OPERATOR ::= Negative {: RESULT = " -Texto Generico- "; :}
+                    ; 
 
-FUNCTION_CALL_PARAMETER ::= SIMPLE_EXPRESSION;
-
-FUNCTION_CALL_PARAMETER_LIST ::= FUNCTION_CALL_PARAMETER 
-                               | FUNCTION_CALL_PARAMETER Comma FUNCTION_CALL_PARAMETER_LIST
-                               ;
-
-FUNCTION_CALL_PARAMETER_OPTION ::= /* Vacío */ 
-                                 | FUNCTION_CALL_PARAMETER_LIST
-                                 ;
-
-FUNCTION_CALL ::= FUNCTION_NAME ParenthesisOpening FUNCTION_CALL_PARAMETER_OPTION  ParenthesisClosure;
-
-FUNCTION_CALL_EXPRESSION ::= FUNCTION_CALL EndSentence;
-
-NEGATIVE_LITERAL ::= NEGATIVE_OPERATOR IntegerLiteral 
-                   | NEGATIVE_OPERATOR FloatLiteral;
-
-UNARY_ARITHMETIC_EXPRESSION ::= Identifier Increment 
-                              | Identifier Decrement;
-
-
-EXPRESSION ::= NEGATIVE_LITERAL 
-             | ARITHMETIC_EXPRESSION
-             | LOGICAL_EXPRESSION             
-             ;
-
-
-SIMPLE_EXPRESSION ::= Identifier                     
-                    | LITERALS
-                    | ARRAY_USE
-                    | FUNCTION_CALL
-                    | UNARY_ARITHMETIC_EXPRESSION
-                    | ParenthesisOpening EXPRESSION ParenthesisClosure
-                    ;
-
-ARITHMETIC_EXPRESSION ::= SIMPLE_EXPRESSION
-                        | ARITHMETIC_EXPRESSION BINARY_ARITHMETIC_OPERATOR ARITHMETIC_EXPRESSION
+FUNCTION_CALL_PARAMETER ::= SIMPLE_EXPRESSION {: RESULT = " -Texto Generico- "; :}
                         ;
 
-RELATIONAL_OPERATOR ::= Less 
-                      | LessEqual 
-                      | Greater
-                      | GreaterEqual
-                      | Equal
-                      | NotEqual
-                      ;
+FUNCTION_CALL_PARAMETER_LIST ::= FUNCTION_CALL_PARAMETER {: RESULT = " -Texto Generico- "; :}
+                               | FUNCTION_CALL_PARAMETER Comma FUNCTION_CALL_PARAMETER_LIST {: RESULT = " -Texto Generico- "; :}
+                               ;
 
-RELATIONAL_EXPRESSION ::= ARITHMETIC_EXPRESSION RELATIONAL_OPERATOR ARITHMETIC_EXPRESSION;
+FUNCTION_CALL_PARAMETER_OPTION ::= /* Vacío */ {: RESULT = " -Texto Generico VACÍO- "; :}
+                                 | FUNCTION_CALL_PARAMETER_LIST {: RESULT = " -Texto Generico- "; :}
+                                 ;
 
-LOGICAL_EXPRESSION ::= RELATIONAL_EXPRESSION
-                     | Negation LOGICAL_EXPRESSION
-                     | LOGICAL_EXPRESSION Conjunction RELATIONAL_EXPRESSION 
-                     | LOGICAL_EXPRESSION Disjunction RELATIONAL_EXPRESSION
-                     | LOGICAL_EXPRESSION Conjunction ARITHMETIC_EXPRESSION 
-                     | LOGICAL_EXPRESSION Disjunction ARITHMETIC_EXPRESSION
-                     ;
+FUNCTION_CALL ::= FUNCTION_NAME ParenthesisOpening FUNCTION_CALL_PARAMETER_OPTION  ParenthesisClosure {: RESULT = " -Texto Generico- "; :}
+                ;
 
-EXPRESSION_LIST ::= EXPRESSION 
-                  | EXPRESSION Comma EXPRESSION_LIST;
+FUNCTION_CALL_EXPRESSION ::= FUNCTION_CALL EndSentence {: RESULT = " -Texto Generico- "; :}
+                           ;
 
-VARIABLE_ASSIGNMENT ::= Identifier AssignmentSign EXPRESSION EndSentence
-                      | UNARY_ARITHMETIC_EXPRESSION EndSentence
-                      | Identifier AssignmentSign ARRAY_ELEMENTS EndSentence //Para asignación de arreglo de elementos
-                      | ARRAY_USE AssignmentSign EXPRESSION EndSentence //Para asignación de un elemento en el arreglo
-                      ;
-
-CONTROL_STRUCTURE ::= IF_ELSE_STRUCTURE_TYPE 
-                    | WHILE_STRUCTURE
-                    | FOR_STRUCTURE
-                    | SWITCH_STRUCTURE
-                    ;
-
-IF_STRUCTURE ::= If ParenthesisOpening LOGICAL_EXPRESSION ParenthesisClosure BlockOpening FUNCTION_DECLARATION_BODY BlockClosure ;
-
-ELSE_STRUCTURE ::= Else BlockOpening FUNCTION_DECLARATION_BODY BlockClosure ;
-
-ELSE_IF_STRUCTURE ::= Else If ParenthesisOpening LOGICAL_EXPRESSION ParenthesisClosure BlockOpening FUNCTION_DECLARATION_BODY BlockClosure 
-                    | ELSE_IF_STRUCTURE ELSE_STRUCTURE
-                    ;
-
-IF_ELSE_STRUCTURE_TYPE ::= IF_STRUCTURE
-                         | IF_STRUCTURE ELSE_STRUCTURE
-                         | IF_STRUCTURE ELSE_IF_STRUCTURE
-                         ;
-
-WHILE_STRUCTURE ::= While ParenthesisOpening LOGICAL_EXPRESSION ParenthesisClosure BlockOpening FUNCTION_DECLARATION_BODY BlockClosure;
-
-FOR_STRUCTURE ::= For ParenthesisOpening INIT_FOR_STRUCTURE LOGICAL_EXPRESSION EndSentence UPDATE_EXPRESSION ParenthesisClosure BlockOpening FUNCTION_DECLARATION_BODY BlockClosure;
-
-INIT_FOR_STRUCTURE ::= VARIABLE_DECLARATION
-                     | VARIABLE_ASSIGNMENT
-                     ;
-
-UPDATE_EXPRESSION ::= UNARY_ARITHMETIC_EXPRESSION
-                    | Identifier AssignmentSign EXPRESSION
-                    ;
-
-SWITCH_STRUCTURE ::= Switch ParenthesisOpening SWITCH_EXPRESSION ParenthesisClosure BlockOpening CASES  BlockClosure;
-
-CASES ::= CASE 
-        | CASE CASES;
-
-CASE ::= Case CASE_LABEL Colon FUNCTION_DECLARATION_BODY
-       | Default Colon FUNCTION_DECLARATION_BODY
-       ;
-
-SWITCH_EXPRESSION ::= Identifier                      
-                    | Integer 
-                    | Char 
-                    | ARRAY_USE
-                    | FUNCTION_CALL
-                    | UNARY_ARITHMETIC_EXPRESSION
-                    | ParenthesisOpening EXPRESSION ParenthesisClosure
-                    ;
-
-CASE_LABEL ::= Identifier                      
-             | IntegerLiteral 
-             | CharacterLiteral
-             ;
-
-RETURN_STATEMENT ::= Return EndSentence
-                   | Return EXPRESSION EndSentence
+NEGATIVE_LITERAL ::= NEGATIVE_OPERATOR IntegerLiteral {: RESULT = " -Texto Generico- "; :}
+                   | NEGATIVE_OPERATOR FloatLiteral {: RESULT = " -Texto Generico- "; :}
                    ;
 
-BREAK_STATEMENT ::= Break EndSentence
+UNARY_ARITHMETIC_EXPRESSION ::= Identifier Increment {: RESULT = " -Texto Generico- "; :}
+                              | Identifier Decrement {: RESULT = " -Texto Generico- "; :}
+                              ;
+
+
+EXPRESSION ::= NEGATIVE_LITERAL {: RESULT = " -Texto Generico- "; :}
+             | ARITHMETIC_EXPRESSION {: RESULT = " -Texto Generico- "; :}
+             | LOGICAL_EXPRESSION  {: RESULT = " -Texto Generico- "; :}           
+             ;
+
+
+SIMPLE_EXPRESSION ::= Identifier {: RESULT = " -Texto Generico- "; :}                    
+                    | LITERALS {: RESULT = " -Texto Generico- "; :}
+                    | ARRAY_USE {: RESULT = " -Texto Generico- "; :}
+                    | FUNCTION_CALL {: RESULT = " -Texto Generico- "; :}
+                    | UNARY_ARITHMETIC_EXPRESSION {: RESULT = " -Texto Generico- "; :}
+                    | ParenthesisOpening EXPRESSION ParenthesisClosure {: RESULT = " -Texto Generico- "; :}
+                    ;
+
+ARITHMETIC_EXPRESSION ::= SIMPLE_EXPRESSION {: RESULT = " -Texto Generico- "; :}
+                        | ARITHMETIC_EXPRESSION BINARY_ARITHMETIC_OPERATOR ARITHMETIC_EXPRESSION {: RESULT = " -Texto Generico- "; :}
+                        ;
+
+RELATIONAL_OPERATOR ::= Less {: RESULT = " -Texto Generico- "; :}
+                      | LessEqual {: RESULT = " -Texto Generico- "; :}
+                      | Greater {: RESULT = " -Texto Generico- "; :}
+                      | GreaterEqual {: RESULT = " -Texto Generico- "; :}
+                      | Equal {: RESULT = " -Texto Generico- "; :}
+                      | NotEqual {: RESULT = " -Texto Generico- "; :}
+                      ;
+
+RELATIONAL_EXPRESSION ::= ARITHMETIC_EXPRESSION RELATIONAL_OPERATOR ARITHMETIC_EXPRESSION {: RESULT = " -Texto Generico- "; :}
+                        ;
+
+LOGICAL_EXPRESSION ::= RELATIONAL_EXPRESSION {: RESULT = " -Texto Generico- "; :}
+                     | Negation LOGICAL_EXPRESSION {: RESULT = " -Texto Generico- "; :}
+                     | LOGICAL_EXPRESSION Conjunction RELATIONAL_EXPRESSION {: RESULT = " -Texto Generico- "; :}
+                     | LOGICAL_EXPRESSION Disjunction RELATIONAL_EXPRESSION {: RESULT = " -Texto Generico- "; :}
+                     | LOGICAL_EXPRESSION Conjunction ARITHMETIC_EXPRESSION {: RESULT = " -Texto Generico- "; :}
+                     | LOGICAL_EXPRESSION Disjunction ARITHMETIC_EXPRESSION {: RESULT = " -Texto Generico- "; :}
+                     ;
+
+EXPRESSION_LIST ::= EXPRESSION {: RESULT = " -Texto Generico- "; :}
+                  | EXPRESSION Comma EXPRESSION_LIST {: RESULT = " -Texto Generico- "; :}
+                  ;
+
+VARIABLE_ASSIGNMENT ::= Identifier AssignmentSign EXPRESSION EndSentence {: RESULT = " -Texto Generico- "; :}
+                      | UNARY_ARITHMETIC_EXPRESSION EndSentence {: RESULT = " -Texto Generico- "; :}
+                      | Identifier AssignmentSign ARRAY_ELEMENTS EndSentence //Para asignación de arreglo de elementos
+                        {: RESULT = " -Texto Generico- "; :}
+                      | ARRAY_USE AssignmentSign EXPRESSION EndSentence //Para asignación de un elemento en el arreglo
+                        {: RESULT = " -Texto Generico- "; :}
+                      ;
+
+CONTROL_STRUCTURE ::= IF_ELSE_STRUCTURE_TYPE {: RESULT = " -Texto Generico- "; :}
+                    | WHILE_STRUCTURE {: RESULT = " -Texto Generico- "; :}
+                    | FOR_STRUCTURE {: RESULT = " -Texto Generico- "; :}
+                    | SWITCH_STRUCTURE {: RESULT = " -Texto Generico- "; :}
+                    ;
+
+IF_STRUCTURE ::= If ParenthesisOpening LOGICAL_EXPRESSION ParenthesisClosure BlockOpening FUNCTION_DECLARATION_BODY BlockClosure {: RESULT = " -Texto Generico- "; :}
+               ;
+
+ELSE_STRUCTURE ::= Else BlockOpening FUNCTION_DECLARATION_BODY BlockClosure {: RESULT = " -Texto Generico- "; :}
+                 ;
+
+ELSE_IF_STRUCTURE ::= Else If ParenthesisOpening LOGICAL_EXPRESSION ParenthesisClosure BlockOpening FUNCTION_DECLARATION_BODY BlockClosure {: RESULT = " -Texto Generico- "; :}
+                    | ELSE_IF_STRUCTURE ELSE_STRUCTURE {: RESULT = " -Texto Generico- "; :}
+                    ;
+
+IF_ELSE_STRUCTURE_TYPE ::= IF_STRUCTURE {: RESULT = " -Texto Generico- "; :}
+                         | IF_STRUCTURE ELSE_STRUCTURE {: RESULT = " -Texto Generico- "; :}
+                         | IF_STRUCTURE ELSE_IF_STRUCTURE {: RESULT = " -Texto Generico- "; :}
+                         ;
+
+WHILE_STRUCTURE ::= While ParenthesisOpening LOGICAL_EXPRESSION ParenthesisClosure BlockOpening FUNCTION_DECLARATION_BODY BlockClosure {: RESULT = " -Texto Generico- "; :}
+                  ;
+
+FOR_STRUCTURE ::= For ParenthesisOpening INIT_FOR_STRUCTURE LOGICAL_EXPRESSION EndSentence UPDATE_EXPRESSION ParenthesisClosure BlockOpening FUNCTION_DECLARATION_BODY BlockClosure {: RESULT = " -Texto Generico- "; :}
+                ;
+
+INIT_FOR_STRUCTURE ::= VARIABLE_DECLARATION {: RESULT = " -Texto Generico- "; :}
+                     | VARIABLE_ASSIGNMENT {: RESULT = " -Texto Generico- "; :}
+                     ;
+
+UPDATE_EXPRESSION ::= UNARY_ARITHMETIC_EXPRESSION {: RESULT = " -Texto Generico- "; :}
+                    | Identifier AssignmentSign EXPRESSION {: RESULT = " -Texto Generico- "; :}
+                    ;
+
+SWITCH_STRUCTURE ::= Switch ParenthesisOpening SWITCH_EXPRESSION ParenthesisClosure BlockOpening CASES  BlockClosure {: RESULT = " -Texto Generico- "; :}
+                   ;
+
+CASES ::= CASE {: RESULT = " -Texto Generico- "; :}
+        | CASE CASES {: RESULT = " -Texto Generico- "; :}
+        ;
+
+CASE ::= Case CASE_LABEL Colon FUNCTION_DECLARATION_BODY {: RESULT = " -Texto Generico- "; :}
+       | Default Colon FUNCTION_DECLARATION_BODY {: RESULT = " -Texto Generico- "; :}
+       ;
+
+SWITCH_EXPRESSION ::= Identifier  {: RESULT = " -Texto Generico- "; :}                    
+                    | Integer {: RESULT = " -Texto Generico- "; :}
+                    | Char {: RESULT = " -Texto Generico- "; :}
+                    | ARRAY_USE {: RESULT = " -Texto Generico- "; :}
+                    | FUNCTION_CALL {: RESULT = " -Texto Generico- "; :}
+                    | UNARY_ARITHMETIC_EXPRESSION {: RESULT = " -Texto Generico- "; :}
+                    | ParenthesisOpening EXPRESSION ParenthesisClosure {: RESULT = " -Texto Generico- "; :}
+                    ;
+
+CASE_LABEL ::= Identifier {: RESULT = " -Texto Generico- "; :}                     
+             | IntegerLiteral {: RESULT = " -Texto Generico- "; :}
+             | CharacterLiteral {: RESULT = " -Texto Generico- "; :}
+             ;
+
+RETURN_STATEMENT ::= Return EndSentence {: RESULT = " -Texto Generico- "; :}
+                   | Return EXPRESSION EndSentence {: RESULT = " -Texto Generico- "; :}
+                   ;
+
+BREAK_STATEMENT ::= Break EndSentence {: RESULT = " -Texto Generico- "; :}
                   ;
