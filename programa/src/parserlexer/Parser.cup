@@ -176,6 +176,61 @@ FUNCTION_BODY_ELEMENT ::= VARIABLE_DECLARATION
                         | BREAK_STATEMENT
                         ;
 
+VARIABLE_DECLARATION ::= VARIABLE_TYPE:type Identifier:id EndSentence
+                        {: 
+                            symbolTable.addVariable(id.toString(), type.toString(), "local");
+                            System.out.println("Variable " + id.toString() + " de tipo " + type.toString() + " ha sido declarada.");
+                        :}
+                       | VARIABLE_TYPE:type Identifier:id AssignmentSign EXPRESSION EndSentence
+                        {: 
+                            symbolTable.addVariable(id.toString(), type.toString(), "local");
+                            System.out.println("Variable " + id.toString() + " de tipo " + type.toString() + " ha sido declarada.");
+                        :}
+                       | ARRAY_DECLARATION EndSentence 
+                       | ARRAY_DECLARATION AssignmentSign ARRAY_ELEMENTS EndSentence
+                       | VARIABLE_DECLARATION FIND_ERROR_WITH_END_SENTENCE
+                       ;
+
+ARRAY_ELEMENTS ::= BlockOpening LITERAL_LIST:list BlockClosure
+                 {: 
+                     System.out.println("Elementos del array: " + list.toString());
+                 :}
+                 | ARRAY_ELEMENTS FIND_ERROR_WITH_BLOCK_CLOSURE
+                 {: 
+                     System.out.println("Error en los elementos del array.");
+                 :};
+
+ARRAY_DECLARATION ::= VARIABLE_TYPE:type Identifier:id BracketOpening BracketClosure 
+                    {: 
+                        symbolTable.addVariable(id.toString(), type.toString() + "[]", "local");
+                        System.out.println("Array " + id.toString() + " de tipo " + type.toString() + " declarado.");
+                    :}
+                    | VARIABLE_TYPE:type Identifier:id BracketOpening Integer:size BracketClosure 
+                    {: 
+                        symbolTable.addVariable(id.toString(), type.toString() + "[" + size + "]", "local");
+                        System.out.println("Array " + id.toString() + " con tamaño " + size + " declarado.");
+                    :}
+                    | VARIABLE_TYPE:type Identifier:id BracketOpening Identifier:sizeId BracketClosure 
+                    {: 
+                        symbolTable.addVariable(id.toString(), type.toString() + "[]", "local");
+                        System.out.println("Array " + id.toString() + " de tamaño variable " + sizeId + " declarado.");
+                        symbolTable.printVariableSymbols();
+                    :};
+
+ARRAY_USE ::= Identifier BracketOpening Integer BracketClosure 
+            | Identifier BracketOpening Identifier BracketClosure
+            ;
+
+LITERAL_LIST ::= LITERALS
+               | LITERAL_LIST Comma LITERALS
+               ;
+
+LITERALS ::= IntegerLiteral 
+           | FloatLiteral 
+           | BoolLiteral 
+           | CharacterLiteral 
+           | StringLiteral;
+
 PRINT_STATEMENT ::= Print ParenthesisOpening EXPRESSION ParenthesisClosure EndSentence
                   | PRINT_STATEMENT FIND_ERROR_WITH_END_SENTENCE
                   ;
@@ -183,15 +238,6 @@ PRINT_STATEMENT ::= Print ParenthesisOpening EXPRESSION ParenthesisClosure EndSe
 READ_STATEMENT ::= Read ParenthesisOpening Identifier ParenthesisClosure EndSentence
                  | READ_STATEMENT FIND_ERROR_WITH_END_SENTENCE
                  ;
-
-ARRAY_DECLARATION ::= VARIABLE_TYPE Identifier BracketOpening  BracketClosure 
-                    | VARIABLE_TYPE Identifier BracketOpening Integer BracketClosure 
-                    | VARIABLE_TYPE Identifier BracketOpening Identifier BracketClosure 
-                    ;
-
-ARRAY_USE ::= Identifier BracketOpening Integer BracketClosure 
-            | Identifier BracketOpening Identifier BracketClosure
-            ;
 
 BINARY_ARITHMETIC_OPERATOR ::= Sum 
                              | Subtraction 
@@ -201,12 +247,6 @@ BINARY_ARITHMETIC_OPERATOR ::= Sum
                              | Power;
 
 NEGATIVE_OPERATOR ::= Negative; 
-
-LITERALS ::= IntegerLiteral 
-           | FloatLiteral 
-           | BoolLiteral 
-           | CharacterLiteral 
-           | StringLiteral;
 
 FUNCTION_CALL_PARAMETER ::= SIMPLE_EXPRESSION;
 
@@ -264,25 +304,6 @@ LOGICAL_EXPRESSION ::= RELATIONAL_EXPRESSION
                      | LOGICAL_EXPRESSION Conjunction ARITHMETIC_EXPRESSION 
                      | LOGICAL_EXPRESSION Disjunction ARITHMETIC_EXPRESSION
                      ;
-
-VARIABLE_DECLARATION ::= VARIABLE_TYPE:type Identifier:id EndSentence
-                        {: 
-                            symbolTable.addVariable(id.toString(), type.toString(), "local");
-                            System.out.println("Variable " + id.toString() + " de tipo " + type.toString() + " ha sido declarada.");
-                        :}
-                       | VARIABLE_TYPE Identifier AssignmentSign EXPRESSION EndSentence 
-                       | ARRAY_DECLARATION EndSentence 
-                       | ARRAY_DECLARATION AssignmentSign ARRAY_ELEMENTS EndSentence
-                       | VARIABLE_DECLARATION FIND_ERROR_WITH_END_SENTENCE
-                       ;
-
-ARRAY_ELEMENTS ::= BlockOpening LITERAL_LIST BlockClosure
-                 | ARRAY_ELEMENTS FIND_ERROR_WITH_BLOCK_CLOSURE
-                 ;
-
-LITERAL_LIST ::= LITERALS
-               | LITERAL_LIST Comma LITERALS
-               ;
 
 EXPRESSION_LIST ::= EXPRESSION 
                   | EXPRESSION Comma EXPRESSION_LIST;
