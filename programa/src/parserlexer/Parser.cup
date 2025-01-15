@@ -56,6 +56,10 @@ parser code
          String salida = "Encontrado " +prodName+ " : cerca de Linea: " + (s.right + 1) + " Columna: " + (s.left + 1) + ", Texto: \"" + s.value + "\"";
          System.out.println(salida); 
     }
+
+    public Object getSymbolTable() {
+        return this.action_obj.symbolTable;
+    }
 :};
 
 /* TERMINALS */

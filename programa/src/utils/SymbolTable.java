@@ -36,6 +36,14 @@ public class SymbolTable {
     public boolean containsFunctionKey (String name){
      return variableSymbols.containsKey(name);
     }
+    
+    public Map<String, FunctionSymbol> getFunctionSymbols (){
+     return functionSymbols;
+    }
+    
+    public Map<String, VariableSymbol> getVariableSymbols (){
+     return variableSymbols;
+    }
 
     // Imprime todas las funciones en la tabla de símbolos con formato de tabla
     public void printFunctionSymbols() {

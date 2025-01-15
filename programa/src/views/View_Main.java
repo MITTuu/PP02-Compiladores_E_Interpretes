@@ -13,6 +13,7 @@ import java.io.IOException;
 import java.io.StringReader;
 import java.nio.file.Files;
 import java.util.List;
+import java.util.Map;
 import java.util.logging.Logger;
 import java_cup.runtime.Symbol;
 import javax.swing.JFileChooser;
@@ -20,6 +21,9 @@ import javax.swing.JOptionPane;
 import javax.swing.JTextArea;
 import javax.swing.SwingUtilities;
 import javax.swing.filechooser.FileNameExtensionFilter;
+import utils.SymbolTable;
+import utils.SymbolTable.FunctionSymbol;
+import utils.SymbolTable.VariableSymbol;
 
 
 public class View_Main extends javax.swing.JFrame {
@@ -129,9 +133,9 @@ public class View_Main extends javax.swing.JFrame {
         Parser parser = new Parser(new Lexer(new StringReader(expr)));
 
         try {
-            parser.parse();
+            parser.parse();            
             
-             Lexer s =  (Lexer) parser.getScanner();
+            Lexer s =  (Lexer) parser.getScanner();
             
             List<Symbol> lexErrorList = s.lexErrorList;
             // Obtener los errores acumulados
@@ -161,8 +165,12 @@ public class View_Main extends javax.swing.JFrame {
                 
                 jTextArea_Output.setText(mensajeErrores.toString());
                 jTextArea_Output.setForeground(Color.red);
-                lineNumberComponent.repaint();
+                lineNumberComponent.repaint();               
             }
+            //Funcionalidad tabla de símbolos
+            SymbolTable symbolTable = (SymbolTable) parser.getSymbolTable();
+            showSymbolTable(symbolTable);
+            
         } catch (Exception ex) {
             Symbol sym = parser.getS();
             jTextArea_Output.setText("Error crítico de sintaxis. Linea: " + (sym.right + 1) + " Columna: " + (sym.left + 1) + ", Texto: \"" + sym.value + "\"");
@@ -387,7 +395,24 @@ public class View_Main extends javax.swing.JFrame {
         }
     }
 
-    
+    // Método para mostrar el contenido de la tabla de símbolos
+    public static void showSymbolTable(SymbolTable symbolTable) {
+            StringBuilder sb = new StringBuilder();
+
+            sb.append("Funciones:\n");
+            for (Map.Entry<String, FunctionSymbol> entry : symbolTable.getFunctionSymbols().entrySet()) {
+                sb.append(" Scope: ").append(entry.getValue().getName() ).append("Parametros: " +entry.getValue().getParameters()+ " | Tipo del retorno: " +entry.getValue().getReturnType()).append("\n");
+            }
+
+            sb.append("\nVariables:\n");
+            for (Map.Entry<String, VariableSymbol> entry : symbolTable.getVariableSymbols().entrySet()) {
+                sb.append(" Scope: ").append(entry.getValue().getScope()).append("-> Nombre: ").append(entry.getValue().getName() +" | Tipo: " +entry.getValue().getType()).append("\n");
+            }
+
+            // Mostrar el contenido en un JOptionPane
+            JOptionPane.showMessageDialog(null, sb.toString(), "Tabla de Símbolos", JOptionPane.INFORMATION_MESSAGE);
+        }
+     
     /**
      * This method is called from within the constructor to initialize the form.
      * WARNING: Do NOT modify this code. The content of this method is always
