@@ -1,10 +1,10 @@
 package views;
 
-import bin.sym;
 import bin.Lexer;
 import bin.Parser;
 import bin.sym;
 import java.awt.Color;
+import java.awt.Font;
 import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -12,30 +12,45 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.io.StringReader;
 import java.nio.file.Files;
-import java.util.ArrayList;
 import java.util.List;
-import java.util.logging.Level;
 import java.util.logging.Logger;
-import java_cup.runtime.Scanner;
 import java_cup.runtime.Symbol;
 import javax.swing.JFileChooser;
 import javax.swing.JOptionPane;
 import javax.swing.JTextArea;
+import javax.swing.SwingUtilities;
 import javax.swing.filechooser.FileNameExtensionFilter;
 
-/**
- *
- * @author dylan
- */
+
 public class View_Main extends javax.swing.JFrame {
 
+    LineNumberComponent lineNumberComponent;
     /**
      * Creates new form GUI_Main
      */
     public View_Main() {
         initComponents();
+        SwingUtilities.invokeLater(() -> {
         this.setLocationRelativeTo(null);
         
+        jTextArea_Input.setLineWrap(false); // Desactiva el salto de línea automático
+        jTextArea_Input.setWrapStyleWord(false);
+        
+        Font font = new Font("Consolas", Font.PLAIN, 14);   
+        jTextArea_Input.setFont(font);
+        
+        // Crea el numerador de líneas
+        lineNumberComponent = new LineNumberComponent(jTextArea_Input);        
+        
+        lineNumberComponent.setFont(font);
+
+        // Añádelo como row header al JScrollPane
+        jScrollPane1.setRowHeaderView(lineNumberComponent);
+        
+        // Actualiza las líneas con el scroll
+        jScrollPane1.getVerticalScrollBar().addAdjustmentListener(e -> lineNumberComponent.repaint());
+
+        });
     }
     
     /**
@@ -64,6 +79,7 @@ public class View_Main extends javax.swing.JFrame {
             try {
                 String ST = new String(Files.readAllBytes(file.toPath()));
                 jTextArea_Input.setText(ST);  // Establecer el contenido del file en el JTextArea
+                lineNumberComponent.repaint();
             } catch (FileNotFoundException ex) {
                 Logger.getLogger(View_Main.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
             } catch (IOException ex) {
@@ -145,6 +161,7 @@ public class View_Main extends javax.swing.JFrame {
                 
                 jTextArea_Output.setText(mensajeErrores.toString());
                 jTextArea_Output.setForeground(Color.red);
+                lineNumberComponent.repaint();
             }
         } catch (Exception ex) {
             Symbol sym = parser.getS();
@@ -197,9 +214,10 @@ public class View_Main extends javax.swing.JFrame {
                         for (Symbol sym: lexErrorList){
                             sb.append("Linea: " + (sym.right + 1) + " Columna: " + (sym.left + 1) + ", Texto: \"" + sym.value + "\"").append("\n");
                         }
-                }    
+                    }    
                     
                     jTextArea_Output.setText(sb.toString());
+                    lineNumberComponent.repaint();
                     return;
                 }
               
