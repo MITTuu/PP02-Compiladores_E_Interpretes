@@ -4,11 +4,14 @@ import java_cup.runtime.Symbol;
 import java.util.ArrayList;
 import java.util.List;
 import utils.SymbolTable;
+import utils.TreeNode;
 
 action code 
 {:     
     String currentHash;
-    public SymbolTable symbolTable = new SymbolTable(); 
+    public SymbolTable symbolTable = new SymbolTable();
+    public TreeNode treeNode = new TreeNode("PROGRAM");
+    public TreeNode functionNode;
 :}
 
 parser code
@@ -59,6 +62,10 @@ parser code
 
     public Object getSymbolTable() {
         return this.action_obj.symbolTable;
+    }
+
+    public Object getTreeNode() {
+        return this.action_obj.treeNode;
     }
 :};
 
@@ -135,14 +142,7 @@ start with PROGRAM;
 
 // Definición del non terminal inicial
 PROGRAM ::= /* Vacío */ 
-
-          | PROGRAM FUNCTION_DECLARATION 
-          {: RESULT = " -Texto Generico- "; 
-            System.out.println("\nTablas de simbolos generadas");
-            symbolTable.printFunctionSymbols();
-            symbolTable.printVariableSymbols();
-          :}
-          ;
+          | PROGRAM FUNCTION_DECLARATION {: RESULT = " -Texto Generico- "; :};
 
 FUNCTION ::= VARIABLE_TYPE:type FUNCTION_NAME:name 
              ParenthesisOpening PARAMETER_DECLARATION_OPTION:params ParenthesisClosure 
@@ -150,8 +150,11 @@ FUNCTION ::= VARIABLE_TYPE:type FUNCTION_NAME:name
                     currentHash = name.toString();
                     if(!symbolTable.containsFunctionKey(currentHash))
                     {
+                        functionNode = new TreeNode("Function: " + name.toString());
+                        treeNode.addChild(functionNode);
+
                         symbolTable.addFunction(name.toString(), type.toString(), params.toString());                            
-                        System.out.println("La funcion " + name.toString() + " ha sido agregada a la tabla de símbolos.");
+                        //System.out.println("La funcion " + name.toString() + " ha sido agregada a la tabla de símbolos.");
 
                     }else {
                         parser.logError("La función '" + name.toString() + "' ya está definida.");
@@ -216,8 +219,11 @@ VARIABLE_DECLARATION ::= VARIABLE_TYPE:type Identifier:id EndSentence
                             RESULT = " -Texto Generico- ";
                             if(!symbolTable.containsVariableKey(id.toString()))
                             {
+                                TreeNode variableNode = new TreeNode("Variable: " + id.toString());
+                                functionNode.addChild(variableNode);
+
                                 symbolTable.addVariable(id.toString(), type.toString(), currentHash);
-                                System.out.println("(Alcance: " + currentHash + ") Variable " + id.toString() + " de tipo " + type.toString() + " ha sido declarada.");
+                                //System.out.println("(Alcance: " + currentHash + ") Variable " + id.toString() + " de tipo " + type.toString() + " ha sido declarada.");
                             }else {
                                 parser.logError("La variable '" + id.toString() + "' ya está definida.");
                             }                            
@@ -227,8 +233,11 @@ VARIABLE_DECLARATION ::= VARIABLE_TYPE:type Identifier:id EndSentence
                             RESULT = " -Texto Generico- ";                            
                             if(!symbolTable.containsVariableKey(id.toString()))
                             {
+                                TreeNode variableNode = new TreeNode("Variable: " + id.toString());
+                                functionNode.addChild(variableNode);
+
                                 symbolTable.addVariable(id.toString(), type.toString(), currentHash);
-                                System.out.println("(Alcance: " + currentHash + ") Variable " + id.toString() + " de tipo " + type.toString() + " ha sido declarada.");
+                                //System.out.println("(Alcance: " + currentHash + ") Variable " + id.toString() + " de tipo " + type.toString() + " ha sido declarada.");
                             }else {
                                 parser.logError("La variable '" + id.toString() + "' ya está definida.");
                             }
@@ -240,7 +249,7 @@ VARIABLE_DECLARATION ::= VARIABLE_TYPE:type Identifier:id EndSentence
 ARRAY_ELEMENTS ::= BlockOpening LITERAL_LIST:list BlockClosure
                     {: 
                         RESULT = " -Texto Generico- "; 
-                        System.out.println("Elementos del array: " + list.toString());
+                        //System.out.println("Elementos del array: " + list.toString());
                     :}
                  ;
 
@@ -249,8 +258,11 @@ ARRAY_DECLARATION ::= VARIABLE_TYPE:type Identifier:id BracketOpening BracketClo
                         RESULT = " -Texto Generico- ";                         
                         if(!symbolTable.containsVariableKey(id.toString()))
                         {
+                            TreeNode variableNode = new TreeNode("Variable: " + id.toString());
+                            functionNode.addChild(variableNode);
+
                             symbolTable.addVariable(id.toString(), type.toString() + "[]", currentHash);
-                            System.out.println("(Alcance: " + currentHash + ") Array " + id.toString() + " de tipo " + type.toString() + " declarado.");
+                            //System.out.println("(Alcance: " + currentHash + ") Array " + id.toString() + " de tipo " + type.toString() + " declarado.");
                         }else {
                             parser.logError("La variable '" + id.toString() + "' ya está definida.");
                         }
@@ -260,8 +272,11 @@ ARRAY_DECLARATION ::= VARIABLE_TYPE:type Identifier:id BracketOpening BracketClo
                         RESULT = " -Texto Generico- ";                        
                         if(!symbolTable.containsVariableKey(id.toString()))
                         {
+                           TreeNode variableNode = new TreeNode("Variable: " + id.toString());
+                           functionNode.addChild(variableNode);
+
                            symbolTable.addVariable(id.toString(), type.toString() + "[" + size + "]", currentHash);
-                           System.out.println("(Alcance: " + currentHash + ") Array " + id.toString() + " con tamaño " + size + " declarado.");
+                           //System.out.println("(Alcance: " + currentHash + ") Array " + id.toString() + " con tamaño " + size + " declarado.");
                         }else {
                             parser.logError("La variable '" + id.toString() + "' ya está definida.");
                         }
@@ -271,8 +286,11 @@ ARRAY_DECLARATION ::= VARIABLE_TYPE:type Identifier:id BracketOpening BracketClo
                         RESULT = " -Texto Generico- ";                        
                         if(!symbolTable.containsVariableKey(id.toString()))
                         {
+                           TreeNode variableNode = new TreeNode("Variable: " + id.toString());
+                           functionNode.addChild(variableNode);
+
                            symbolTable.addVariable(id.toString(), type.toString() + "[]", currentHash);
-                           System.out.println("(Alcance: " + currentHash + ") Array " + id.toString() + " de tamaño variable " + sizeId + " declarado.");
+                           //System.out.println("(Alcance: " + currentHash + ") Array " + id.toString() + " de tamaño variable " + sizeId + " declarado.");
                         }else {
                             parser.logError("La variable '" + id.toString() + "' ya está definida.");
                         }

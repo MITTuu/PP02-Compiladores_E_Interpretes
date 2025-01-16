@@ -24,7 +24,7 @@ import javax.swing.filechooser.FileNameExtensionFilter;
 import utils.SymbolTable;
 import utils.SymbolTable.FunctionSymbol;
 import utils.SymbolTable.VariableSymbol;
-
+import utils.TreeNode;
 
 public class View_Main extends javax.swing.JFrame {
 
@@ -169,7 +169,14 @@ public class View_Main extends javax.swing.JFrame {
             }
             //Funcionalidad tabla de símbolos
             SymbolTable symbolTable = (SymbolTable) parser.getSymbolTable();
+            symbolTable.printVariableSymbols();
+            
+            TreeNode treeNode = (TreeNode) parser.getTreeNode();
+            treeNode.printTree("");
+            
             showSymbolTable(symbolTable);
+            
+            showTreeNode(treeNode);
             
         } catch (Exception ex) {
             Symbol sym = parser.getS();
@@ -397,21 +404,44 @@ public class View_Main extends javax.swing.JFrame {
 
     // Método para mostrar el contenido de la tabla de símbolos
     public static void showSymbolTable(SymbolTable symbolTable) {
-            StringBuilder sb = new StringBuilder();
+        StringBuilder sb = new StringBuilder();
 
-            sb.append("Funciones:\n");
-            for (Map.Entry<String, FunctionSymbol> entry : symbolTable.getFunctionSymbols().entrySet()) {
-                sb.append(" Scope: ").append(entry.getValue().getName() ).append("Parametros: " +entry.getValue().getParameters()+ " | Tipo del retorno: " +entry.getValue().getReturnType()).append("\n");
-            }
-
-            sb.append("\nVariables:\n");
-            for (Map.Entry<String, VariableSymbol> entry : symbolTable.getVariableSymbols().entrySet()) {
-                sb.append(" Scope: ").append(entry.getValue().getScope()).append("-> Nombre: ").append(entry.getValue().getName() +" | Tipo: " +entry.getValue().getType()).append("\n");
-            }
-
-            // Mostrar el contenido en un JOptionPane
-            JOptionPane.showMessageDialog(null, sb.toString(), "Tabla de Símbolos", JOptionPane.INFORMATION_MESSAGE);
+        sb.append("Funciones:\n");
+        for (Map.Entry<String, FunctionSymbol> entry : symbolTable.getFunctionSymbols().entrySet()) {
+            sb.append(" Scope: ").append(entry.getValue().getName() ).append("Parametros: " +entry.getValue().getParameters()+ " | Tipo del retorno: " +entry.getValue().getReturnType()).append("\n");
         }
+
+        sb.append("\nVariables:\n");
+        for (Map.Entry<String, VariableSymbol> entry : symbolTable.getVariableSymbols().entrySet()) {
+            sb.append(" Scope: ").append(entry.getValue().getScope()).append(" -> Nombre: ").append(entry.getValue().getName() +" | Tipo: " +entry.getValue().getType()).append("\n");
+        }
+
+        // Mostrar el contenido en un JOptionPane
+        JOptionPane.showMessageDialog(null, sb.toString(), "Tabla de Símbolos", JOptionPane.PLAIN_MESSAGE);
+    }
+    
+    // Método para mostrar el contenido de la tabla de símbolos
+    public static void showTreeNode(TreeNode treeNode) {
+        StringBuilder sb = new StringBuilder();
+        
+        buildTreeString(sb, treeNode, 0);
+        
+        JOptionPane.showMessageDialog(null, sb.toString(), "Árbol Sintáctico", JOptionPane.PLAIN_MESSAGE);
+    }
+
+    // Método recursivo para construir la cadena de texto del árbol
+    private static void buildTreeString(StringBuilder sb, TreeNode node, int level) {
+        // Añadir el nodo actual con la indentación correspondiente
+        for (int i = 0; i < level; i++) {
+            sb.append("         ");
+        }
+        sb.append(node.getValue()).append("\n");
+        
+        // Recursión sobre los hijos del nodo actual
+        for (TreeNode child : node.getChildren()) {
+            buildTreeString(sb, child, level + 1);
+        }
+    }
      
     /**
      * This method is called from within the constructor to initialize the form.
