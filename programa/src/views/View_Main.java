@@ -406,15 +406,15 @@ public class View_Main extends javax.swing.JFrame {
     public static void showSymbolTable(SymbolTable symbolTable) {
         StringBuilder sb = new StringBuilder();
 
-        sb.append("Funciones:\n");
-        for (Map.Entry<String, FunctionSymbol> entry : symbolTable.getFunctionSymbols().entrySet()) {
-            sb.append(" Scope: ").append(entry.getValue().getName() ).append("Parametros: " +entry.getValue().getParameters()+ " | Tipo del retorno: " +entry.getValue().getReturnType()).append("\n");
-        }
+            sb.append("Funciones:\n");
+            for (Map.Entry<String, FunctionSymbol> entry : symbolTable.getFunctionSymbols().entrySet()) {
+                sb.append(" Scope: ").append(entry.getValue().getName() ).append(" -> Parametros: " +entry.getValue().getParameters()+ " | Tipo del retorno: " +entry.getValue().getReturnType()).append("\n");
+            }
 
-        sb.append("\nVariables:\n");
-        for (Map.Entry<String, VariableSymbol> entry : symbolTable.getVariableSymbols().entrySet()) {
-            sb.append(" Scope: ").append(entry.getValue().getScope()).append(" -> Nombre: ").append(entry.getValue().getName() +" | Tipo: " +entry.getValue().getType()).append("\n");
-        }
+            sb.append("\nVariables:\n");
+            for (Map.Entry<String, VariableSymbol> entry : symbolTable.getVariableSymbols().entrySet()) {
+                sb.append(" Scope: ").append(entry.getValue().getScope()).append(" -> Nombre: ").append(entry.getValue().getName() +" | Tipo: " +entry.getValue().getType()).append("\n");
+            }
 
         // Mostrar el contenido en un JOptionPane
         JOptionPane.showMessageDialog(null, sb.toString(), "Tabla de Símbolos", JOptionPane.PLAIN_MESSAGE);
